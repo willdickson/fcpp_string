@@ -23,6 +23,8 @@ extern "C"
 
     void string_append_char(std::string *s, char c[]);
 
+    int string_compare(std::string *s0, std::string *s1);
+
 }
 
 #endif // STRING_CAPI_HPP

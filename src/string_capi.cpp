@@ -79,3 +79,23 @@ void string_append_char(std::string *s, char c[])
     }
 }
 
+
+int string_compare(std::string *s0, std::string *s1)
+{
+    int rval = 0;
+    if ((s0 != nullptr) && (s1 != nullptr)) 
+    {
+        rval = s0 -> compare(*s1);
+    }
+    else if ((s0 != nullptr) && (s1 == nullptr))
+    {
+        rval = s0 -> compare(std::string());
+    }
+    else if ((s0 == nullptr) && (s1 != nullptr))
+    {
+        rval = std::string().compare(*s1);
+    }
+    return rval;
+}
+
+

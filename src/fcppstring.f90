@@ -13,9 +13,9 @@ contains
         type(string_t) :: s3 
         integer        :: i
 
-        s1 = string_t('bob, ')
         s2 = string_t('string value')
         s3 = s1 + 'this thing' 
+
 
         !s3 = string_t(s2)
 
@@ -55,6 +55,16 @@ contains
         print *, 'len(char(s3)) = ', len(char(s3))
         print *, ''
 
+        s1 = 'a'
+        s2 = 'b'
+
+        print *, 's1 = ', char(s1) 
+        print *, 's2 = ', char(s2) 
+        print *, 's1 % compare(s2) = ', s1 % compare(s2)
+        print *, 's1 == s2, ', s1 == s2
+        print *, 's1 == s1, ', s1 == s1
+        print *, 's1 /= s2, ', s1 /= s2
+        print *, 's1 /= s1, ', s1 /= s1
 
 
     end subroutine test

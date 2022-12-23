@@ -1,6 +1,7 @@
 module cpp_string_m
 
     use, intrinsic :: iso_c_binding,   only : c_ptr
+    use, intrinsic :: iso_c_binding,   only : c_int
     use, intrinsic :: iso_c_binding,   only : c_char
     use, intrinsic :: iso_c_binding,   only : c_size_t
     use, intrinsic :: iso_c_binding,   only : c_null_char
@@ -19,6 +20,7 @@ module cpp_string_m
         procedure, public :: size          => string_size
         procedure, public :: to_character  => string_to_character
         procedure, public :: clear         => string_clear
+        procedure, public :: compare       => string_compare
 
         procedure         :: string_at_size_t
         procedure         :: string_at_integer
@@ -41,6 +43,12 @@ module cpp_string_m
         procedure         :: string_copy_from_char
         generic,   public :: assignment(=) => string_copy, &
                                               string_copy_from_char
+
+        procedure         :: string_equals
+        generic,   public :: operator(==)  => string_equals
+
+        procedure         :: string_not_equals
+        generic,   public :: operator(/=)  => string_not_equals
 
 
         final             :: string_delete
@@ -132,8 +140,8 @@ module cpp_string_m
                 bind(c, name='string_append')
             import c_ptr
             implicit none
-            type(c_ptr), intent(in),    value :: ptr1
-            type(c_ptr), intent(in),    value :: ptr2  
+            type(c_ptr), intent(in), value :: ptr1
+            type(c_ptr), intent(in), value :: ptr2  
         end subroutine string_append_c
 
 
@@ -145,6 +153,18 @@ module cpp_string_m
             type(c_ptr), intent(in), value     :: ptr
             character(kind=c_char), intent(in) :: c(*)
         end subroutine string_append_char_c
+
+
+        function string_compare_c(ptr1, ptr2) &
+                bind(c, name='string_compare') result(val)
+            import c_ptr
+            import c_int
+            implicit none
+            type(c_ptr), intent(in), value :: ptr1
+            type(c_ptr), intent(in), value :: ptr2
+            integer(c_int)                 :: val
+        end function string_compare_c
+
 
 
     end interface
@@ -187,6 +207,7 @@ contains
 
 
     ! Destructor
+    ! --------------------------------------------------------------------------
     subroutine string_delete(this)
         type(string_t), intent(inout) :: this
         call string_delete_c(this % ptr)
@@ -194,6 +215,7 @@ contains
 
 
     ! Bound procedures
+    ! --------------------------------------------------------------------------
     function string_size(this) result(val)
         class(string_t), intent(in) :: this
         integer(c_size_t)           :: val
@@ -248,6 +270,31 @@ contains
             call string_clear_c(this % ptr)
         end if
     end subroutine string_clear
+
+
+    function string_compare(this, that) result(rval)
+        class(string_t), intent(in) :: this
+        type(string_t),  intent(in) :: that 
+        integer(c_int)              :: rval
+        logical                     :: ok_this
+        logical                     :: ok_that
+        type(string_t)              :: tmps 
+        ok_this = c_associated(this % ptr)
+        ok_that = c_associated(that % ptr)
+        if ((.not. ok_this) .and. (.not. ok_that)) then
+            rval = 0
+        else
+            if (.not. ok_this) then
+                tmps = string_t()
+                rval = string_compare_c(tmps % ptr, that % ptr)
+            else if (.not. ok_that) then
+                tmps = string_t()
+                rval = string_compare_c(this % ptr, tmps % ptr)
+            else 
+                rval = string_compare_c(this % ptr, that % ptr)
+            end if
+        end if
+    end function string_compare
 
 
     subroutine string_append(this, other)
@@ -315,8 +362,33 @@ contains
     end subroutine string_copy_from_char
 
 
+    function string_equals(this, that) result(rval)
+        class(string_t), intent(in) :: this
+        type(string_t),  intent(in) :: that
+        logical                     :: rval
+        integer(c_int)              :: comp
+        if (this % compare(that) == 0) then
+            rval = .true.
+        else
+            rval = .false.
+        end if
+    end function string_equals
+
+    function string_not_equals(this, that) result(rval)
+        class(string_t), intent(in) :: this
+        type(string_t),  intent(in) :: that
+        logical                     :: rval
+        integer(c_int)              :: comp
+        if (this % compare(that) == 0) then
+            rval = .false.
+        else
+            rval = .true.
+        end if
+    end function string_not_equals
+
+
     ! Utility subroutines/functions
-    ! ------------------------------------------------------------
+    ! --------------------------------------------------------------------------
 
     function string_to_char(string) result(chrstr)
         type(string_t), intent(in) :: string
