@@ -29,6 +29,8 @@ extern "C"
 
     bool string_empty(std::string *s);
 
+    void string_erase(std::string *s, size_t pos, size_t len);
+
 }
 
 #endif // STRING_CAPI_HPP

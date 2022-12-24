@@ -12,7 +12,6 @@ contains
         type(string_t) :: s2
         type(string_t) :: s3 
         type(string_t) :: s4
-        integer        :: i
 
         s2 = string_t('string value')
         s3 = s1 + 'this thing' 
@@ -70,6 +69,12 @@ contains
         print *, 's1 == s1, ', s1 == s1
         print *, 's1 /= s2, ', s1 /= s2
         print *, 's1 /= s1, ', s1 /= s1
+        print *, ''
+
+        s1 = '123456'
+        print *, 's1 = ', char(s1)
+        call s1 % erase(2,3)
+        print *, 's1 = ', char(s1)
 
 
     end subroutine test

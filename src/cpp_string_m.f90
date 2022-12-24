@@ -25,6 +25,16 @@ module cpp_string_m
         procedure, public :: empty         => string_empty
         procedure, public :: push_back     => string_push_back
 
+
+        procedure         :: string_erase
+        procedure         :: string_erase_op1
+        procedure         :: string_erase_op2
+        procedure         :: string_erase_integer
+        generic,   public :: erase         => string_erase,     &
+                                              string_erase_op1, &
+                                              string_erase_op2, &
+                                              string_erase_integer
+
         procedure         :: string_at_size_t
         procedure         :: string_at_integer
         generic,   public :: at            => string_at_size_t, &
@@ -187,6 +197,16 @@ module cpp_string_m
             logical(c_bool)                :: val
         end function
 
+
+        subroutine string_erase_c(ptr, pos, len) &
+                bind(c, name='string_erase')
+            import c_ptr
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value        :: ptr
+            integer(c_size_t), intent(in), value  :: pos
+            integer(c_size_t), intent(in), value  :: len
+        end subroutine string_erase_c
 
 
     end interface
@@ -432,6 +452,72 @@ contains
             rval = string_empty_c(this % ptr)
         end if
     end function string_empty
+
+
+    subroutine string_erase(this, pos, len)
+        class(string_t), intent(inout)  :: this
+        integer(c_size_t), intent(in)   :: pos
+        integer(c_size_t), intent(in)   :: len
+        if (c_associated(this % ptr)) then
+            call string_erase_c(this % ptr, pos - 1, len)
+        end if
+    end subroutine string_erase
+
+
+    subroutine string_erase_op1(this, pos, len)
+        class(string_t), intent(inout)  :: this
+        integer, intent(in), optional   :: pos
+        integer(c_size_t), intent(in)   :: len
+        integer(c_size_t)               :: pos_
+        if (present(pos)) then
+            pos_ = int(pos, kind=c_size_t)
+        else
+            pos_ = 1_c_size_t
+        end if
+
+        if (c_associated(this % ptr)) then
+            call string_erase_c(this % ptr, pos_ - 1, len)
+        end if
+    end subroutine string_erase_op1
+
+
+    subroutine string_erase_op2(this, pos, len)
+        class(string_t), intent(inout)  :: this
+        integer(c_size_t), intent(in)   :: pos
+        integer, intent(in), optional   :: len
+        integer(c_size_t)               :: len_
+        if (present(len)) then
+            len_ = int(len, kind=c_size_t)
+        else
+            len_ = this % size()
+        end if
+
+        if (c_associated(this % ptr)) then
+            call string_erase_c(this % ptr, pos - 1, len_)
+        end if
+    end subroutine string_erase_op2
+
+
+    subroutine string_erase_integer(this, pos, len)
+        class(string_t), intent(inout) :: this
+        integer, intent(in), optional  :: pos
+        integer, intent(in), optional  :: len
+        integer(c_size_t)              :: pos_
+        integer(c_size_t)              :: len_
+        if (c_associated(this % ptr)) then
+            if (present(pos)) then
+                pos_ = int(pos, kind=c_size_t)
+            else
+                pos_ = 1_c_size_t
+            end if
+            if (present(len)) then
+                len_ = int(len, kind=c_size_t)
+            else
+                len_ = this % size()
+            end if
+            call string_erase_c(this % ptr, pos_ - 1, len_)
+        end if
+    end subroutine string_erase_integer
 
 
     ! Utility subroutines/functions
