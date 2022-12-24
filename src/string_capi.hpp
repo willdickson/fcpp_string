@@ -23,7 +23,11 @@ extern "C"
 
     void string_append_char(std::string *s, char c[]);
 
+    void string_push_back(std::string *s, char c[1]);
+
     int string_compare(std::string *s0, std::string *s1);
+
+    bool string_empty(std::string *s);
 
 }
 

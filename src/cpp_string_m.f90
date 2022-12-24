@@ -1,12 +1,13 @@
 module cpp_string_m
 
-    use, intrinsic :: iso_c_binding,   only : c_ptr
-    use, intrinsic :: iso_c_binding,   only : c_int
-    use, intrinsic :: iso_c_binding,   only : c_char
-    use, intrinsic :: iso_c_binding,   only : c_size_t
-    use, intrinsic :: iso_c_binding,   only : c_null_char
-    use, intrinsic :: iso_c_binding,   only : c_null_ptr
-    use, intrinsic :: iso_c_binding,   only : c_associated
+    use, intrinsic :: iso_c_binding,  only : c_ptr
+    use, intrinsic :: iso_c_binding,  only : c_int
+    use, intrinsic :: iso_c_binding,  only : c_char
+    use, intrinsic :: iso_c_binding,  only : c_bool
+    use, intrinsic :: iso_c_binding,  only : c_size_t
+    use, intrinsic :: iso_c_binding,  only : c_null_char
+    use, intrinsic :: iso_c_binding,  only : c_null_ptr
+    use, intrinsic :: iso_c_binding,  only : c_associated
 
     implicit none
     private
@@ -21,6 +22,8 @@ module cpp_string_m
         procedure, public :: to_character  => string_to_character
         procedure, public :: clear         => string_clear
         procedure, public :: compare       => string_compare
+        procedure, public :: empty         => string_empty
+        procedure, public :: push_back     => string_push_back
 
         procedure         :: string_at_size_t
         procedure         :: string_at_integer
@@ -31,7 +34,6 @@ module cpp_string_m
         procedure         :: string_append_char
         generic,   public :: append        => string_append, &
                                               string_append_char
-
         procedure         :: string_add
         procedure         :: string_add_char
         procedure, pass(this) :: char_add_string
@@ -155,6 +157,16 @@ module cpp_string_m
         end subroutine string_append_char_c
 
 
+        subroutine string_push_back_c(ptr, c) &
+                bind(c, name='string_push_back')
+            import c_ptr
+            import c_char
+            implicit none
+            type(c_ptr), intent(in), value      :: ptr
+            character(kind=c_char), intent(in)  :: c(*)
+        end subroutine string_push_back_c
+
+
         function string_compare_c(ptr1, ptr2) &
                 bind(c, name='string_compare') result(val)
             import c_ptr
@@ -164,6 +176,16 @@ module cpp_string_m
             type(c_ptr), intent(in), value :: ptr2
             integer(c_int)                 :: val
         end function string_compare_c
+
+
+        function string_empty_c(ptr) &
+                bind(c, name='string_empty') result(val)
+            import c_ptr
+            import c_bool
+            implicit none
+            type(c_ptr), intent(in), value :: ptr
+            logical(c_bool)                :: val
+        end function
 
 
 
@@ -317,6 +339,19 @@ contains
     end subroutine string_append_char
 
 
+    subroutine string_push_back(this, c)
+        class(string_t), intent(inout)   :: this
+        character(*),    intent(in)      :: c
+        integer                          :: i
+        if (.not. c_associated(this % ptr)) then
+            this % ptr = string_new_empty_c()
+        end if
+        do i = 1, len(c)
+            call string_push_back_c(this % ptr, c(i:i))
+        end do
+    end subroutine string_push_back
+
+
     function string_add(this, other) result(rval)
         class(string_t), intent(in) :: this
         type(string_t),  intent(in) :: other
@@ -374,6 +409,7 @@ contains
         end if
     end function string_equals
 
+
     function string_not_equals(this, that) result(rval)
         class(string_t), intent(in) :: this
         type(string_t),  intent(in) :: that
@@ -385,6 +421,17 @@ contains
             rval = .true.
         end if
     end function string_not_equals
+
+
+    function string_empty(this) result(rval)
+        class(string_t), intent(in) :: this
+        logical                     :: rval
+        if (.not. c_associated(this % ptr)) then
+            rval = .true.
+        else
+            rval = string_empty_c(this % ptr)
+        end if
+    end function string_empty
 
 
     ! Utility subroutines/functions

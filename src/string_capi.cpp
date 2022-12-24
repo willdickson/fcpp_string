@@ -72,10 +72,18 @@ void string_append(std::string *s0, std::string *s1)
 
 void string_append_char(std::string *s, char c[])
 {
-    std::cout << "c = " << c << std::endl;
     if (s != nullptr)
     {
         s -> append(c);
+    }
+}
+
+
+void string_push_back(std::string *s, char c[1])
+{
+    if (s != nullptr)
+    {
+        s -> push_back(c[0]);
     }
 }
 
@@ -94,6 +102,17 @@ int string_compare(std::string *s0, std::string *s1)
     else if ((s0 == nullptr) && (s1 != nullptr))
     {
         rval = std::string().compare(*s1);
+    }
+    return rval;
+}
+
+
+bool string_empty(std::string *s)
+{
+    bool rval = true;
+    if (s != nullptr) 
+    {
+        rval = s -> empty();
     }
     return rval;
 }

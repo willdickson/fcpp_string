@@ -11,13 +11,18 @@ contains
         type(string_t) :: s1 
         type(string_t) :: s2
         type(string_t) :: s3 
+        type(string_t) :: s4
         integer        :: i
 
         s2 = string_t('string value')
         s3 = s1 + 'this thing' 
 
+        call s3 % push_back('a')
 
         !s3 = string_t(s2)
+
+        s4 = s2 % at(1)
+        print *, char(s4)
 
         print *, 's1 = ', char(s1) 
         print *, 'len(char(s1)) = ', len(char(s1))
