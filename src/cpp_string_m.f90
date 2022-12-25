@@ -57,10 +57,12 @@ module cpp_string_m
 
         procedure         :: string_find
         procedure         :: string_find_at_int
-        !procedure         :: string_find_char
-        !procedure         :: string_find_char_at_int
-        generic,   public :: find          => string_find, &
-                                              string_find_at_int
+        procedure         :: string_find_char
+        procedure         :: string_find_char_at_int
+        generic,   public :: find          => string_find,        &
+                                              string_find_at_int, &
+                                              string_find_char,   &
+                                              string_find_char_at_int
         generic,   public :: assignment(=) => string_copy, &
                                               string_copy_from_char
         procedure         :: string_equals
@@ -241,6 +243,19 @@ module cpp_string_m
             integer(c_size_t), intent(in), value :: pos
             integer(c_size_t)                    :: val
         end function string_find_c
+
+
+        function string_find_char_c(ptr, c, pos) &
+                bind(c, name='string_find_char') result(val)
+            import c_ptr
+            import c_char
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value       :: ptr
+            character(kind=c_char), intent(in)   :: c(*)
+            integer(c_size_t), intent(in), value :: pos
+            integer(c_size_t)                    :: val
+        end function string_find_char_c
 
 
     end interface
@@ -503,7 +518,7 @@ contains
         integer(c_size_t), intent(in)   :: pos
         integer(c_size_t), intent(in)   :: len
         if (c_associated(this % ptr)) then
-            call string_erase_c(this % ptr, pos - 1, len)
+            call string_erase_c(this % ptr, pos-1, len)
         end if
     end subroutine string_erase
 
@@ -520,7 +535,7 @@ contains
         end if
 
         if (c_associated(this % ptr)) then
-            call string_erase_c(this % ptr, pos_ - 1, len)
+            call string_erase_c(this % ptr, pos_-1, len)
         end if
     end subroutine string_erase_op1
 
@@ -537,7 +552,7 @@ contains
         end if
 
         if (c_associated(this % ptr)) then
-            call string_erase_c(this % ptr, pos - 1, len_)
+            call string_erase_c(this % ptr, pos-1, len_)
         end if
     end subroutine string_erase_op2
 
@@ -559,7 +574,7 @@ contains
             else
                 len_ = this % size()
             end if
-            call string_erase_c(this % ptr, pos_ - 1, len_)
+            call string_erase_c(this % ptr, pos_-1, len_)
         end if
     end subroutine string_erase_at_int
 
@@ -568,11 +583,13 @@ contains
         class(string_t), intent(inout) :: this
         integer(c_size_t), intent(in)  :: pos
         type(string_t), intent(in)     :: str 
+        integer(c_size_t)              :: pos_c
         if (.not. c_associated(this % ptr)) then
             this % ptr = string_new_empty_c()
         end if
         if (c_associated(str % ptr)) then 
-            call string_insert_c(this % ptr, pos, str % ptr)
+            pos_c = max(pos-1, 0)
+            call string_insert_c(this % ptr, pos_c, str % ptr)
         end if
     end subroutine string_insert
 
@@ -592,10 +609,12 @@ contains
         type(string_t),    intent(in)  :: str
         integer(c_size_t), intent(in)  :: pos
         integer(c_size_t)              :: rval
+        integer(c_size_t)              :: pos_c
         if (.not. c_associated(this % ptr)) then
-            rval = -1
+            rval = 0 
         else
-            rval = string_find_c(this % ptr, str % ptr, pos) + 1
+            pos_c = max(pos-1, 0)
+            rval = string_find_c(this % ptr, str % ptr, pos_c) + 1
         end if
     end function string_find
 
@@ -609,10 +628,40 @@ contains
         if (present(pos)) then
             pos_ = int(pos, kind=c_size_t)
         else
-            pos_ = 0_c_size_t
+            pos_ = 1_c_size_t
         end if
         rval = this % string_find(str, pos_)
     end function string_find_at_int
+
+
+    function string_find_char(this, c, pos) result(rval)
+        class(string_t),   intent(in) :: this
+        character(*),      intent(in) :: c
+        integer(c_size_t), intent(in) :: pos
+        integer(c_size_t)             :: rval
+        integer(c_size_t)             :: pos_c
+        if (.not. c_associated(this % ptr)) then
+            rval = 0 
+        else
+            pos_c = max(pos-1,0)
+            rval = string_find_char_c(this % ptr, c, pos_c) + 1
+        end if
+    end function string_find_char
+
+
+    function string_find_char_at_int(this, c, pos) result(rval)
+        class(string_t),   intent(in) :: this
+        character(*),      intent(in) :: c
+        integer, optional, intent(in) :: pos
+        integer(c_size_t)             :: rval
+        integer(c_size_t)             :: pos_
+        if (present(pos)) then
+            pos_ = int(pos, kind=c_size_t)
+        else
+            pos_ = 1_c_size_t
+        end if
+        rval = this % string_find_char(c, pos_)
+    end function string_find_char_at_int
 
 
     ! Utility subroutines/functions

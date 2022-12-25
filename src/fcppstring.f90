@@ -75,11 +75,12 @@ contains
         s1 = '123456'
         s2 = 'abc'
         print *, 's1 = ', char(s1)
+        print *, 's2 = ', char(s2)
         call s1 % erase(2,3)
         print *, 's1 = ', char(s1)
         print *, ''
 
-        call s1 % insert(2, s2)
+        call s1 % insert(1, s2)
         print *, char(s1)
         print *, ''
 
@@ -94,10 +95,8 @@ contains
         s2 = 'jo'
 
         print *, char(s1)
-        print *, s1 % find(s2) 
+        print *, 'found at: ', s1 % find('will', 1)
         print *, ''
-
-
 
     end subroutine test
 end module fcppstring

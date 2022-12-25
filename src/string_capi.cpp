@@ -154,3 +154,12 @@ size_t string_find(std::string *s0, std::string *s1, size_t pos)
     }
 }
 
+
+size_t string_find_char(std::string *s0, char c[], size_t pos)
+{
+    size_t rval = std::string::npos;
+    if (s0 != nullptr) 
+    {
+        rval = s0 -> find(c, pos);
+    }
+}
