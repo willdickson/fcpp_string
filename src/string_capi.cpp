@@ -144,3 +144,13 @@ void string_pop_back(std::string *s)
     }
 }
 
+
+size_t string_find(std::string *s0, std::string *s1, size_t pos)
+{
+    size_t rval = std::string::npos;
+    if ((s0 != nullptr) && (s1 != nullptr))
+    {
+        rval = s0 -> find(*s1, pos);
+    }
+}
+

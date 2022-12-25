@@ -90,6 +90,14 @@ contains
         print *, char(s1)
         print *, ''
 
+        s1 = 'will jo bob'
+        s2 = 'jo'
+
+        print *, char(s1)
+        print *, s1 % find(s2) 
+        print *, ''
+
+
 
     end subroutine test
 end module fcppstring

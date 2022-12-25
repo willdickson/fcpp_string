@@ -54,6 +54,13 @@ module cpp_string_m
                                                char_add_string
         procedure         :: string_copy
         procedure         :: string_copy_from_char
+
+        procedure         :: string_find
+        procedure         :: string_find_at_int
+        !procedure         :: string_find_char
+        !procedure         :: string_find_char_at_int
+        generic,   public :: find          => string_find, &
+                                              string_find_at_int
         generic,   public :: assignment(=) => string_copy, &
                                               string_copy_from_char
         procedure         :: string_equals
@@ -222,6 +229,18 @@ module cpp_string_m
             integer(c_size_t), intent(in), value :: pos
             type(c_ptr), intent(in), value       :: ptr2
         end subroutine string_insert_c
+
+
+        function string_find_c(ptr1, ptr2, pos) &
+                bind(c, name='string_find') result(val)
+            import c_ptr
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value       :: ptr1
+            type(c_ptr), intent(in), value       :: ptr2
+            integer(c_size_t), intent(in), value :: pos
+            integer(c_size_t)                    :: val
+        end function string_find_c
 
 
     end interface
@@ -566,6 +585,34 @@ contains
         pos_ = int(pos, kind=c_size_t)
         call this % string_insert(pos_, str)
     end subroutine string_insert_at_int
+
+
+    function string_find(this, str, pos) result(rval)
+        class(string_t),   intent(in)  :: this
+        type(string_t),    intent(in)  :: str
+        integer(c_size_t), intent(in)  :: pos
+        integer(c_size_t)              :: rval
+        if (.not. c_associated(this % ptr)) then
+            rval = -1
+        else
+            rval = string_find_c(this % ptr, str % ptr, pos) + 1
+        end if
+    end function string_find
+
+
+    function string_find_at_int(this, str, pos) result(rval)
+        class(string_t),   intent(in)  :: this
+        type(string_t),    intent(in)  :: str
+        integer, optional, intent(in)  :: pos
+        integer(c_size_t)              :: rval
+        integer(c_size_t)              :: pos_
+        if (present(pos)) then
+            pos_ = int(pos, kind=c_size_t)
+        else
+            pos_ = 0_c_size_t
+        end if
+        rval = this % string_find(str, pos_)
+    end function string_find_at_int
 
 
     ! Utility subroutines/functions
