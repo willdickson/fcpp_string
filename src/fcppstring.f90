@@ -81,6 +81,14 @@ contains
 
         call s1 % insert(2, s2)
         print *, char(s1)
+        print *, ''
+
+        call s1 % pop_back()
+        print *, char(s1)
+        print *, ''
+        call s1 % pop_back()
+        print *, char(s1)
+        print *, ''
 
 
     end subroutine test

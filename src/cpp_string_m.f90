@@ -24,8 +24,11 @@ module cpp_string_m
         procedure, public :: compare       => string_compare
         procedure, public :: empty         => string_empty
         procedure, public :: push_back     => string_push_back
-
-
+        procedure, public :: pop_back      => string_pop_back
+        procedure         :: string_append
+        procedure         :: string_append_char
+        generic,   public :: append        => string_append, &
+                                              string_append_char
         procedure         :: string_erase
         procedure         :: string_erase_op1
         procedure         :: string_erase_op2
@@ -34,17 +37,10 @@ module cpp_string_m
                                               string_erase_op1, &
                                               string_erase_op2, &
                                               string_erase_at_int
-
         procedure         :: string_at_size_t
         procedure         :: string_at_integer
         generic,   public :: at            => string_at_size_t, &
                                               string_at_integer
-
-        procedure         :: string_append
-        procedure         :: string_append_char
-        generic,   public :: append        => string_append, &
-                                              string_append_char
-
         procedure         :: string_insert
         procedure         :: string_insert_at_int
         generic,   public :: insert        => string_insert, &
@@ -56,19 +52,14 @@ module cpp_string_m
         generic,   public :: operator(+)   =>  string_add,      &
                                                string_add_char, &
                                                char_add_string
-
         procedure         :: string_copy
         procedure         :: string_copy_from_char
         generic,   public :: assignment(=) => string_copy, &
                                               string_copy_from_char
-
         procedure         :: string_equals
         generic,   public :: operator(==)  => string_equals
-
         procedure         :: string_not_equals
         generic,   public :: operator(/=)  => string_not_equals
-
-
         final             :: string_delete
     end type string_t
 
@@ -180,6 +171,14 @@ module cpp_string_m
             type(c_ptr), intent(in), value      :: ptr
             character(kind=c_char), intent(in)  :: c(*)
         end subroutine string_push_back_c
+
+
+        subroutine string_pop_back_c(ptr) &
+                bind(c, name='string_pop_back')
+            import c_ptr
+            implicit none
+            type(c_ptr), intent(in), value :: ptr
+        end subroutine string_pop_back_c
 
 
         function string_compare_c(ptr1, ptr2) &
@@ -387,6 +386,15 @@ contains
             call string_push_back_c(this % ptr, c(i:i))
         end do
     end subroutine string_push_back
+
+
+    subroutine string_pop_back(this)
+        class(string_t), intent(inout)   :: this
+        if (.not. c_associated(this % ptr)) then
+            this % ptr = string_new_empty_c()
+        end if
+        call string_pop_back_c(this % ptr)
+    end subroutine string_pop_back
 
 
     function string_add(this, other) result(rval)

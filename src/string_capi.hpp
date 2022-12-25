@@ -32,6 +32,8 @@ extern "C"
     void string_erase(std::string *s, size_t pos, size_t len);
 
     void string_insert(std::string *s0, size_t pos, std::string *s1);
+
+    void string_pop_back(std::string *s);
 }
 
 #endif // STRING_CAPI_HPP

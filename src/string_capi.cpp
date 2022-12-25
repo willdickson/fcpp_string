@@ -134,3 +134,13 @@ void string_insert(std::string *s0, size_t pos, std::string *s1)
         s0 -> insert(pos, *s1);
     }
 }
+
+
+void string_pop_back(std::string *s)
+{
+    if (s != nullptr)
+    {
+        s -> pop_back();
+    }
+}
+
