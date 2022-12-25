@@ -29,11 +29,11 @@ module cpp_string_m
         procedure         :: string_erase
         procedure         :: string_erase_op1
         procedure         :: string_erase_op2
-        procedure         :: string_erase_integer
+        procedure         :: string_erase_at_int
         generic,   public :: erase         => string_erase,     &
                                               string_erase_op1, &
                                               string_erase_op2, &
-                                              string_erase_integer
+                                              string_erase_at_int
 
         procedure         :: string_at_size_t
         procedure         :: string_at_integer
@@ -44,6 +44,12 @@ module cpp_string_m
         procedure         :: string_append_char
         generic,   public :: append        => string_append, &
                                               string_append_char
+
+        procedure         :: string_insert
+        procedure         :: string_insert_at_int
+        generic,   public :: insert        => string_insert, &
+                                              string_insert_at_int
+
         procedure         :: string_add
         procedure         :: string_add_char
         procedure, pass(this) :: char_add_string
@@ -77,7 +83,6 @@ module cpp_string_m
         procedure :: string_new_from_ptr
         procedure :: string_new_from_string
     end interface string_t
-
 
     ! C API 
     ! --------------------------------------------------------------------------
@@ -209,8 +214,20 @@ module cpp_string_m
         end subroutine string_erase_c
 
 
+        subroutine string_insert_c(ptr1, pos, ptr2) &
+                bind(c, name='string_insert')
+            import c_ptr
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value       :: ptr1
+            integer(c_size_t), intent(in), value :: pos
+            type(c_ptr), intent(in), value       :: ptr2
+        end subroutine string_insert_c
+
+
     end interface
     ! --------------------------------------------------------------------------
+
 
 contains
 
@@ -498,7 +515,7 @@ contains
     end subroutine string_erase_op2
 
 
-    subroutine string_erase_integer(this, pos, len)
+    subroutine string_erase_at_int(this, pos, len)
         class(string_t), intent(inout) :: this
         integer, intent(in), optional  :: pos
         integer, intent(in), optional  :: len
@@ -517,7 +534,30 @@ contains
             end if
             call string_erase_c(this % ptr, pos_ - 1, len_)
         end if
-    end subroutine string_erase_integer
+    end subroutine string_erase_at_int
+
+
+    subroutine string_insert(this, pos, str)
+        class(string_t), intent(inout) :: this
+        integer(c_size_t), intent(in)  :: pos
+        type(string_t), intent(in)     :: str 
+        if (.not. c_associated(this % ptr)) then
+            this % ptr = string_new_empty_c()
+        end if
+        if (c_associated(str % ptr)) then 
+            call string_insert_c(this % ptr, pos, str % ptr)
+        end if
+    end subroutine string_insert
+
+
+    subroutine string_insert_at_int(this, pos, str)
+        class(string_t), intent(inout) :: this
+        integer,         intent(in)    :: pos
+        type(string_t),  intent(in)    :: str 
+        integer(c_size_t)              :: pos_
+        pos_ = int(pos, kind=c_size_t)
+        call this % string_insert(pos_, str)
+    end subroutine string_insert_at_int
 
 
     ! Utility subroutines/functions

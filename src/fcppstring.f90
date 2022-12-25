@@ -1,6 +1,7 @@
 module fcppstring
     use cpp_string_m, only : string_t
     use cpp_string_m, only : char
+    use, intrinsic :: iso_c_binding,  only : c_size_t
     implicit none
     private
 
@@ -72,9 +73,14 @@ contains
         print *, ''
 
         s1 = '123456'
+        s2 = 'abc'
         print *, 's1 = ', char(s1)
         call s1 % erase(2,3)
         print *, 's1 = ', char(s1)
+        print *, ''
+
+        call s1 % insert(2, s2)
+        print *, char(s1)
 
 
     end subroutine test

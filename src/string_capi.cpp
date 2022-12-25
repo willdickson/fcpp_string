@@ -127,3 +127,10 @@ void string_erase(std::string *s, size_t pos, size_t len)
 }
 
 
+void string_insert(std::string *s0, size_t pos, std::string *s1)
+{
+    if ((s0 != nullptr) && (s1 != nullptr))
+    {
+        s0 -> insert(pos, *s1);
+    }
+}
