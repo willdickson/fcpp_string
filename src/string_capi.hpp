@@ -21,7 +21,7 @@ extern "C"
 
     void string_append(std::string *s0, std::string *s1);
 
-    void string_append_char(std::string *s, char c[]);
+    void string_append_from_char(std::string *s, char c[]);
 
     void string_push_back(std::string *s, char c[1]);
 
@@ -37,7 +37,11 @@ extern "C"
 
     size_t string_find(std::string *s0, std::string *s1, size_t pos);
 
-    size_t string_find_char(std::string *s0, char c[], size_t pos);
+    size_t string_find_from_char(std::string *s0, char c[], size_t pos);
+
+    size_t string_rfind(std::string *s0, std::string *s1, size_t pos);
+
+    size_t string_rfind_from_char(std::string *s0, char c[], size_t pos);
 }
 
 #endif // STRING_CAPI_HPP

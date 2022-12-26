@@ -70,7 +70,7 @@ void string_append(std::string *s0, std::string *s1)
 }
 
 
-void string_append_char(std::string *s, char c[])
+void string_append_from_char(std::string *s, char c[])
 {
     if (s != nullptr)
     {
@@ -155,7 +155,7 @@ size_t string_find(std::string *s0, std::string *s1, size_t pos)
 }
 
 
-size_t string_find_char(std::string *s0, char c[], size_t pos)
+size_t string_find_from_char(std::string *s0, char c[], size_t pos)
 {
     size_t rval = std::string::npos;
     if (s0 != nullptr) 
@@ -163,3 +163,24 @@ size_t string_find_char(std::string *s0, char c[], size_t pos)
         rval = s0 -> find(c, pos);
     }
 }
+
+
+size_t string_rfind(std::string *s0, std::string *s1, size_t pos)
+{
+    size_t rval = std::string::npos;
+    if ((s0 != nullptr) && (s1 != nullptr)) 
+    {
+        rval = s0 -> rfind(*s1, pos);
+    }
+}
+
+
+size_t string_rfind_from_char(std::string *s0, char c[], size_t pos)
+{
+    size_t rval = std::string::npos;
+    if (s0 != nullptr) 
+    {
+        rval = s0 -> rfind(c, pos);
+    }
+}
+

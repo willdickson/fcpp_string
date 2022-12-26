@@ -26,17 +26,17 @@ module cpp_string_m
         procedure, public :: push_back     => string_push_back
         procedure, public :: pop_back      => string_pop_back
         procedure         :: string_append
-        procedure         :: string_append_char
+        procedure         :: string_append_from_char
         generic,   public :: append        => string_append, &
-                                              string_append_char
+                                              string_append_from_char
         procedure         :: string_erase
-        procedure         :: string_erase_op1
-        procedure         :: string_erase_op2
-        procedure         :: string_erase_at_int
-        generic,   public :: erase         => string_erase,     &
-                                              string_erase_op1, &
-                                              string_erase_op2, &
-                                              string_erase_at_int
+        procedure         :: string_erase_at_int1
+        procedure         :: string_erase_at_int2
+        procedure         :: string_erase_at_int12
+        generic,   public :: erase         => string_erase, &
+                                              string_erase_at_int1, &
+                                              string_erase_at_int2, &
+                                              string_erase_at_int12
         procedure         :: string_at_size_t
         procedure         :: string_at_integer
         generic,   public :: at            => string_at_size_t, &
@@ -49,7 +49,7 @@ module cpp_string_m
         procedure         :: string_add
         procedure         :: string_add_char
         procedure, pass(this) :: char_add_string
-        generic,   public :: operator(+)   =>  string_add,      &
+        generic,   public :: operator(+)   =>  string_add, &
                                                string_add_char, &
                                                char_add_string
         procedure         :: string_copy
@@ -57,12 +57,20 @@ module cpp_string_m
 
         procedure         :: string_find
         procedure         :: string_find_at_int
-        procedure         :: string_find_char
-        procedure         :: string_find_char_at_int
-        generic,   public :: find          => string_find,        &
+        procedure         :: string_find_from_char
+        procedure         :: string_find_from_char_at_int
+        generic,   public :: find          => string_find, &     
                                               string_find_at_int, &
-                                              string_find_char,   &
-                                              string_find_char_at_int
+                                              string_find_from_char, &
+                                              string_find_from_char_at_int
+        !procedure         :: string_rfind
+        !procedure         :: string_rfind_at_int
+        !procedure         :: string_rfind_from_char
+        !procedure         :: string_rfind_from_char_at_int
+        !generic,   public :: rfind         => string_find, &
+        !                                      string_find_at_int, &
+        !                                      string_find_from_char, &
+        !                                      string_find_from_char_at_int
         generic,   public :: assignment(=) => string_copy, &
                                               string_copy_from_char
         procedure         :: string_equals
@@ -162,14 +170,14 @@ module cpp_string_m
         end subroutine string_append_c
 
 
-        subroutine string_append_char_c(ptr, c) & 
-                bind(c, name='string_append_char')
+        subroutine string_append_from_char_c(ptr, c) & 
+                bind(c, name='string_append_from_char')
             import c_ptr
             import c_char
             implicit none
             type(c_ptr), intent(in), value     :: ptr
             character(kind=c_char), intent(in) :: c(*)
-        end subroutine string_append_char_c
+        end subroutine string_append_from_char_c
 
 
         subroutine string_push_back_c(ptr, c) &
@@ -245,8 +253,8 @@ module cpp_string_m
         end function string_find_c
 
 
-        function string_find_char_c(ptr, c, pos) &
-                bind(c, name='string_find_char') result(val)
+        function string_find_from_char_c(ptr, c, pos) &
+                bind(c, name='string_find_from_char') result(val)
             import c_ptr
             import c_char
             import c_size_t
@@ -255,7 +263,32 @@ module cpp_string_m
             character(kind=c_char), intent(in)   :: c(*)
             integer(c_size_t), intent(in), value :: pos
             integer(c_size_t)                    :: val
-        end function string_find_char_c
+        end function string_find_from_char_c
+
+
+        function string_rfind_c(ptr1, ptr2, pos) &
+                bind(c, name='string_rfind') result(val)
+            import c_ptr
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value       :: ptr1
+            type(c_ptr), intent(in), value       :: ptr2
+            integer(c_size_t), intent(in), value :: pos
+            integer(c_size_t)                    :: val
+        end function string_rfind_c
+
+
+        function string_rfind_from_char_c(ptr, c, pos) &
+                bind(c, name='string_rfind_from_char') result(val)
+            import c_ptr
+            import c_char
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value       :: ptr
+            character(kind=c_char), intent(in)   :: c(*)
+            integer(c_size_t), intent(in), value :: pos
+            integer(c_size_t)                    :: val
+        end function string_rfind_from_char_c
 
 
     end interface
@@ -399,14 +432,14 @@ contains
     end subroutine string_append
 
 
-    subroutine string_append_char(this, c)
+    subroutine string_append_from_char(this, c)
         class(string_t), intent(inout) :: this
         character(*),    intent(in)    :: c
         if (.not. c_associated(this % ptr)) then
             this % ptr = string_new_empty_c()
         end if
-        call string_append_char_c(this % ptr, c//c_null_char)
-    end subroutine string_append_char
+        call string_append_from_char_c(this % ptr, c//c_null_char)
+    end subroutine string_append_from_char
 
 
     subroutine string_push_back(this, c)
@@ -523,7 +556,7 @@ contains
     end subroutine string_erase
 
 
-    subroutine string_erase_op1(this, pos, len)
+    subroutine string_erase_at_int1(this, pos, len)
         class(string_t), intent(inout)  :: this
         integer, intent(in), optional   :: pos
         integer(c_size_t), intent(in)   :: len
@@ -537,10 +570,10 @@ contains
         if (c_associated(this % ptr)) then
             call string_erase_c(this % ptr, pos_-1, len)
         end if
-    end subroutine string_erase_op1
+    end subroutine string_erase_at_int1
 
 
-    subroutine string_erase_op2(this, pos, len)
+    subroutine string_erase_at_int2(this, pos, len)
         class(string_t), intent(inout)  :: this
         integer(c_size_t), intent(in)   :: pos
         integer, intent(in), optional   :: len
@@ -554,10 +587,10 @@ contains
         if (c_associated(this % ptr)) then
             call string_erase_c(this % ptr, pos-1, len_)
         end if
-    end subroutine string_erase_op2
+    end subroutine string_erase_at_int2
 
 
-    subroutine string_erase_at_int(this, pos, len)
+    subroutine string_erase_at_int12(this, pos, len)
         class(string_t), intent(inout) :: this
         integer, intent(in), optional  :: pos
         integer, intent(in), optional  :: len
@@ -576,7 +609,7 @@ contains
             end if
             call string_erase_c(this % ptr, pos_-1, len_)
         end if
-    end subroutine string_erase_at_int
+    end subroutine string_erase_at_int12
 
 
     subroutine string_insert(this, pos, str)
@@ -634,7 +667,7 @@ contains
     end function string_find_at_int
 
 
-    function string_find_char(this, c, pos) result(rval)
+    function string_find_from_char(this, c, pos) result(rval)
         class(string_t),   intent(in) :: this
         character(*),      intent(in) :: c
         integer(c_size_t), intent(in) :: pos
@@ -644,12 +677,12 @@ contains
             rval = 0 
         else
             pos_c = max(pos-1,0)
-            rval = string_find_char_c(this % ptr, c, pos_c) + 1
+            rval = string_find_from_char_c(this % ptr, c, pos_c) + 1
         end if
-    end function string_find_char
+    end function string_find_from_char
 
 
-    function string_find_char_at_int(this, c, pos) result(rval)
+    function string_find_from_char_at_int(this, c, pos) result(rval)
         class(string_t),   intent(in) :: this
         character(*),      intent(in) :: c
         integer, optional, intent(in) :: pos
@@ -660,8 +693,8 @@ contains
         else
             pos_ = 1_c_size_t
         end if
-        rval = this % string_find_char(c, pos_)
-    end function string_find_char_at_int
+        rval = this % string_find_from_char(c, pos_)
+    end function string_find_from_char_at_int
 
 
     ! Utility subroutines/functions
