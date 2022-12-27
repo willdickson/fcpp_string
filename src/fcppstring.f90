@@ -102,9 +102,10 @@ contains
         print *, 'found at: ', s1 % rfind('will', 14)
         print *, ''
 
-        s1 = 'willwilllwillwillwill will'
+        s1 = 'bob, dave, allen, carl'
         print *, char(s1)
-        call s1 % replace(string_t('will'), string_t('david'),2)
+        call s1 % replace(',',';')
+        call s1 % replace(' ','')
         print *, char(s1)
 
     end subroutine test

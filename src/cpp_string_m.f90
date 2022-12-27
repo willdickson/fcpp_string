@@ -91,7 +91,10 @@ module cpp_string_m
                                               string_rfind_at_int, &
                                               string_rfind_from_char, &
                                               string_rfind_from_char_at_int
-        procedure, public :: replace       => string_replace
+        procedure         :: string_replace
+        procedure         :: string_replace_from_char
+        generic,   public :: replace       => string_replace, &
+                                              string_replace_from_char
         generic,   public :: assignment(=) => string_copy, &
                                               string_copy_from_char
         procedure         :: string_equals
@@ -627,6 +630,19 @@ contains
         end if
 
     end subroutine string_replace
+
+
+    subroutine string_replace_from_char(this, old, new, cnt)
+        class(string_t),   intent(inout) :: this
+        character(*),      intent(in)    :: old
+        character(*),      intent(in)    :: new
+        integer, optional, intent(in)    :: cnt
+        if (present(cnt)) then
+            call this % string_replace(string_t(old), string_t(new), cnt)
+        else
+            call this % string_replace(string_t(old), string_t(new))
+        end if
+    end subroutine string_replace_from_char
 
 
     ! Utility subroutines/functions
