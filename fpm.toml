@@ -10,5 +10,12 @@ auto-executables = true
 auto-tests = true
 auto-examples = true
 
+[[test]]
+name = 'strings'
+source-dir = 'test'
+
+[test.dependencies]
+test-drive.git = "https://github.com/fortran-lang/test-drive.git"
+
 [install]
 library = false
