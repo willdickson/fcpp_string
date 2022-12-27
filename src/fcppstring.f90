@@ -8,6 +8,7 @@ module fcppstring
     public :: test 
 
 contains
+
     subroutine test
         type(string_t) :: s1 
         type(string_t) :: s2
@@ -106,7 +107,12 @@ contains
         print *, char(s1)
         call s1 % replace(',',';')
         call s1 % replace(' ','')
-        print *, char(s1)
+        print *, 's1 = ', s1
+        print *, ''
+
+        print *, s1
+        print '(dt)', s1
+        print '(a,dt,a,dt)', 's1 = ', s1, ', s2 = ', s2
 
     end subroutine test
 end module fcppstring

@@ -102,6 +102,10 @@ module cpp_string_m
         generic,   public :: operator(==)  => string_equals
         procedure         :: string_not_equals
         generic,   public :: operator(/=)  => string_not_equals
+
+        procedure         :: string_write_formatted
+        generic,   public :: write(formatted)  => string_write_formatted
+
         final             :: string_delete
     end type string_t
 
@@ -610,6 +614,7 @@ contains
 
         logical                          :: ok
         integer(c_size_t)                :: old_size
+        integer(c_size_t)                :: new_size
         integer(c_size_t)                :: pos
         integer                          :: cnt_  
 
@@ -624,8 +629,9 @@ contains
              c_associated( new % ptr)
 
         if (ok) then
-            pos = 1
             old_size = old % size()
+            new_size = new % size()
+            pos = 1
             do while (.true.) 
                 pos = this % find(old, pos)
                 if (pos == 0) then
@@ -633,7 +639,7 @@ contains
                 end if
                 call this % erase(pos, old_size)
                 call this % insert(pos, new)
-                pos = pos + old_size
+                pos = pos + new_size
                 cnt_ = cnt_ - 1
                 if (cnt_ == 0) then
                     exit
@@ -655,6 +661,23 @@ contains
             call this % string_replace(string_t(old), string_t(new))
         end if
     end subroutine string_replace_from_char
+
+
+    subroutine string_write_formatted(this, unit, iotype, v_list, iostat, iomsg)
+        class(string_t),  intent(in)    :: this
+        integer,          intent(in)    :: unit
+        character(len=*), intent(in)    :: iotype
+        integer,          intent(in)    :: v_list(:)
+        integer,          intent(out)   :: iostat
+        character(len=*), intent(inout) :: iomsg
+        select case (iotype)
+        case ('LISTDIRECTED', 'DT')
+            write(unit,'(a)',iostat=iostat, iomsg=iomsg), char(this)
+        case default
+            iostat = 1
+            iomsg = 'unsupported iotype '//iotype//' for string_t'
+        end select
+    end subroutine string_write_formatted
 
 
     ! Utility subroutines/functions
