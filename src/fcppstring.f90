@@ -91,12 +91,21 @@ contains
         print *, char(s1)
         print *, ''
 
-        s1 = 'will jo bob'
-        s2 = 'jo'
+        s1 = 'will bob dave will jo'
+        s2 = '123456789012345678901'
 
         print *, char(s1)
         print *, 'found at: ', s1 % find('will', 1)
         print *, ''
+
+        print *, char(s1)
+        print *, 'found at: ', s1 % rfind('will', 14)
+        print *, ''
+
+        s1 = 'willwilllwillwillwill will'
+        print *, char(s1)
+        call s1 % replace(string_t('will'), string_t('david'),2)
+        print *, char(s1)
 
     end subroutine test
 end module fcppstring

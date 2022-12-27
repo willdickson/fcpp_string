@@ -9,6 +9,26 @@ module cpp_string_m
     use, intrinsic :: iso_c_binding,  only : c_null_ptr
     use, intrinsic :: iso_c_binding,  only : c_associated
 
+    use string_iface, only : string_new_empty_c
+    use string_iface, only : string_new_from_char_c
+    use string_iface, only : string_new_from_ptr_c
+    use string_iface, only : string_delete_c
+    use string_iface, only : string_size_c
+    use string_iface, only : string_at_c
+    use string_iface, only : string_clear_c
+    use string_iface, only : string_append_c
+    use string_iface, only : string_append_from_char_c
+    use string_iface, only : string_push_back_c
+    use string_iface, only : string_pop_back_c
+    use string_iface, only : string_compare_c
+    use string_iface, only : string_empty_c
+    use string_iface, only : string_erase_c
+    use string_iface, only : string_insert_c
+    use string_iface, only : string_find_c
+    use string_iface, only : string_find_from_char_c
+    use string_iface, only : string_rfind_c
+    use string_iface, only : string_rfind_from_char_c
+
     implicit none
     private
 
@@ -63,14 +83,15 @@ module cpp_string_m
                                               string_find_at_int, &
                                               string_find_from_char, &
                                               string_find_from_char_at_int
-        !procedure         :: string_rfind
-        !procedure         :: string_rfind_at_int
-        !procedure         :: string_rfind_from_char
-        !procedure         :: string_rfind_from_char_at_int
-        !generic,   public :: rfind         => string_find, &
-        !                                      string_find_at_int, &
-        !                                      string_find_from_char, &
-        !                                      string_find_from_char_at_int
+        procedure         :: string_rfind
+        procedure         :: string_rfind_at_int
+        procedure         :: string_rfind_from_char
+        procedure         :: string_rfind_from_char_at_int
+        generic,   public :: rfind         => string_rfind, &
+                                              string_rfind_at_int, &
+                                              string_rfind_from_char, &
+                                              string_rfind_from_char_at_int
+        procedure, public :: replace       => string_replace
         generic,   public :: assignment(=) => string_copy, &
                                               string_copy_from_char
         procedure         :: string_equals
@@ -91,208 +112,6 @@ module cpp_string_m
         procedure :: string_new_from_ptr
         procedure :: string_new_from_string
     end interface string_t
-
-    ! C API 
-    ! --------------------------------------------------------------------------
-    interface
-
-        function string_new_empty_c() & 
-                bind(c, name='string_new_empty') result(ptr) 
-            import c_ptr
-            implicit none
-            type(c_ptr) :: ptr
-        end function string_new_empty_c
-
-
-        function string_new_from_char_c(c) & 
-                bind(c, name='string_new_from_char') result(ptr)
-            import c_ptr
-            import c_char
-            implicit none
-            character(kind=c_char), intent(in) :: c(*)
-            type(c_ptr)                        :: ptr
-        end function string_new_from_char_c
-
-
-        function string_new_from_ptr_c(ptr) & 
-                bind(c,name='string_new_from_ptr') result(new_ptr)
-            import c_ptr
-            implicit none
-            type(c_ptr), intent(in), value :: ptr
-            type(c_ptr)                    :: new_ptr
-        end function string_new_from_ptr_c
-
-
-        subroutine string_delete_c(ptr) & 
-                bind(c, name='string_delete')
-            import c_ptr
-            implicit none
-            type(c_ptr), intent(in), value :: ptr
-        end subroutine string_delete_c
-
-
-        function string_size_c(ptr) & 
-                bind(c, name='string_size') result(val)
-            import c_ptr
-            import c_size_t
-            implicit none
-            type(c_ptr), intent(in), value :: ptr
-            integer(c_size_t)              :: val
-        end function string_size_c
-
-
-        function string_at_c(ptr, n) & 
-                bind(c, name='string_at') result(val)
-            import c_ptr
-            import c_char
-            import c_size_t
-            implicit none
-            type(c_ptr), intent(in), value             :: ptr
-            integer(kind=c_size_t), intent(in), value  :: n
-            character(kind=c_char)                     :: val
-        end function string_at_c
-
-
-        subroutine string_clear_c(ptr) & 
-                bind(c, name='string_clear') 
-            import c_ptr
-            implicit none
-            type(c_ptr), intent(in), value :: ptr
-        end subroutine string_clear_c
-
-
-        subroutine string_append_c(ptr1, ptr2) & 
-                bind(c, name='string_append')
-            import c_ptr
-            implicit none
-            type(c_ptr), intent(in), value :: ptr1
-            type(c_ptr), intent(in), value :: ptr2  
-        end subroutine string_append_c
-
-
-        subroutine string_append_from_char_c(ptr, c) & 
-                bind(c, name='string_append_from_char')
-            import c_ptr
-            import c_char
-            implicit none
-            type(c_ptr), intent(in), value     :: ptr
-            character(kind=c_char), intent(in) :: c(*)
-        end subroutine string_append_from_char_c
-
-
-        subroutine string_push_back_c(ptr, c) &
-                bind(c, name='string_push_back')
-            import c_ptr
-            import c_char
-            implicit none
-            type(c_ptr), intent(in), value      :: ptr
-            character(kind=c_char), intent(in)  :: c(*)
-        end subroutine string_push_back_c
-
-
-        subroutine string_pop_back_c(ptr) &
-                bind(c, name='string_pop_back')
-            import c_ptr
-            implicit none
-            type(c_ptr), intent(in), value :: ptr
-        end subroutine string_pop_back_c
-
-
-        function string_compare_c(ptr1, ptr2) &
-                bind(c, name='string_compare') result(val)
-            import c_ptr
-            import c_int
-            implicit none
-            type(c_ptr), intent(in), value :: ptr1
-            type(c_ptr), intent(in), value :: ptr2
-            integer(c_int)                 :: val
-        end function string_compare_c
-
-
-        function string_empty_c(ptr) &
-                bind(c, name='string_empty') result(val)
-            import c_ptr
-            import c_bool
-            implicit none
-            type(c_ptr), intent(in), value :: ptr
-            logical(c_bool)                :: val
-        end function
-
-
-        subroutine string_erase_c(ptr, pos, len) &
-                bind(c, name='string_erase')
-            import c_ptr
-            import c_size_t
-            implicit none
-            type(c_ptr), intent(in), value        :: ptr
-            integer(c_size_t), intent(in), value  :: pos
-            integer(c_size_t), intent(in), value  :: len
-        end subroutine string_erase_c
-
-
-        subroutine string_insert_c(ptr1, pos, ptr2) &
-                bind(c, name='string_insert')
-            import c_ptr
-            import c_size_t
-            implicit none
-            type(c_ptr), intent(in), value       :: ptr1
-            integer(c_size_t), intent(in), value :: pos
-            type(c_ptr), intent(in), value       :: ptr2
-        end subroutine string_insert_c
-
-
-        function string_find_c(ptr1, ptr2, pos) &
-                bind(c, name='string_find') result(val)
-            import c_ptr
-            import c_size_t
-            implicit none
-            type(c_ptr), intent(in), value       :: ptr1
-            type(c_ptr), intent(in), value       :: ptr2
-            integer(c_size_t), intent(in), value :: pos
-            integer(c_size_t)                    :: val
-        end function string_find_c
-
-
-        function string_find_from_char_c(ptr, c, pos) &
-                bind(c, name='string_find_from_char') result(val)
-            import c_ptr
-            import c_char
-            import c_size_t
-            implicit none
-            type(c_ptr), intent(in), value       :: ptr
-            character(kind=c_char), intent(in)   :: c(*)
-            integer(c_size_t), intent(in), value :: pos
-            integer(c_size_t)                    :: val
-        end function string_find_from_char_c
-
-
-        function string_rfind_c(ptr1, ptr2, pos) &
-                bind(c, name='string_rfind') result(val)
-            import c_ptr
-            import c_size_t
-            implicit none
-            type(c_ptr), intent(in), value       :: ptr1
-            type(c_ptr), intent(in), value       :: ptr2
-            integer(c_size_t), intent(in), value :: pos
-            integer(c_size_t)                    :: val
-        end function string_rfind_c
-
-
-        function string_rfind_from_char_c(ptr, c, pos) &
-                bind(c, name='string_rfind_from_char') result(val)
-            import c_ptr
-            import c_char
-            import c_size_t
-            implicit none
-            type(c_ptr), intent(in), value       :: ptr
-            character(kind=c_char), intent(in)   :: c(*)
-            integer(c_size_t), intent(in), value :: pos
-            integer(c_size_t)                    :: val
-        end function string_rfind_from_char_c
-
-
-    end interface
-    ! --------------------------------------------------------------------------
 
 
 contains
@@ -450,7 +269,7 @@ contains
             this % ptr = string_new_empty_c()
         end if
         do i = 1, len(c)
-            call string_push_back_c(this % ptr, c(i:i))
+            call string_push_back_c(this % ptr, c(i:i)//c_null_char)
         end do
     end subroutine string_push_back
 
@@ -677,7 +496,8 @@ contains
             rval = 0 
         else
             pos_c = max(pos-1,0)
-            rval = string_find_from_char_c(this % ptr, c, pos_c) + 1
+            rval = string_find_from_char_c(this % ptr, c//c_null_char, pos_c)
+            rval = rval + 1
         end if
     end function string_find_from_char
 
@@ -695,6 +515,118 @@ contains
         end if
         rval = this % string_find_from_char(c, pos_)
     end function string_find_from_char_at_int
+
+
+    function string_rfind(this, str, pos) result(rval)
+        class(string_t),   intent(in)  :: this
+        type(string_t),    intent(in)  :: str
+        integer(c_size_t), intent(in)  :: pos
+        integer(c_size_t)              :: rval
+        integer(c_size_t)              :: pos_c
+        if (.not. c_associated(this % ptr)) then
+            rval = 0 
+        else
+            pos_c = max(pos-1, 0)
+            rval = string_rfind_c(this % ptr, str % ptr, pos_c)
+            rval = rval + 1
+        end if
+    end function string_rfind
+
+
+    function string_rfind_at_int(this, str, pos) result(rval)
+        class(string_t),   intent(in)  :: this
+        type(string_t),    intent(in)  :: str
+        integer, optional, intent(in)  :: pos
+        integer(c_size_t)              :: rval
+        integer(c_size_t)              :: pos_
+        if (.not. c_associated(this % ptr)) then
+            rval = 0
+        else
+            if (present(pos)) then
+                pos_ = int(pos, kind=c_size_t)
+            else
+                pos_ = this % size()
+            end if
+            rval = this % string_rfind(str, pos_)
+        end if
+    end function string_rfind_at_int
+
+
+    function string_rfind_from_char(this, c, pos) result(rval)
+        class(string_t),   intent(in) :: this
+        character(*),      intent(in) :: c
+        integer(c_size_t), intent(in) :: pos
+        integer(c_size_t)             :: rval
+        integer(c_size_t)             :: pos_c
+        if (.not. c_associated(this % ptr)) then
+            rval = 0 
+        else
+            pos_c = max(pos-1,0)
+            rval = string_rfind_from_char_c(this % ptr, c//c_null_char, pos_c)
+            rval = rval + 1
+        end if
+    end function string_rfind_from_char
+
+
+    function string_rfind_from_char_at_int(this, c, pos) result(rval)
+        class(string_t),   intent(in) :: this
+        character(*),      intent(in) :: c
+        integer, optional, intent(in) :: pos
+        integer(c_size_t)             :: rval
+        integer(c_size_t)             :: pos_
+        if (.not. c_associated(this % ptr)) then
+            rval = 0
+        else
+            if (present(pos)) then
+                pos_ = int(pos, kind=c_size_t)
+            else
+                pos_ = this % size() 
+            end if
+            rval = this % string_rfind_from_char(c, pos_)
+        end if
+    end function string_rfind_from_char_at_int
+
+
+    subroutine string_replace(this, old, new, cnt)
+        class(string_t),   intent(inout) :: this
+        type(string_t),    intent(in)    :: old
+        type(string_t),    intent(in)    :: new
+        integer, optional, intent(in)    :: cnt
+
+        logical                          :: ok
+        integer(c_size_t)                :: old_size
+        integer(c_size_t)                :: pos
+        integer                          :: cnt_  
+
+        if (present(cnt)) then
+            cnt_ = cnt
+        else
+            cnt_ = this % size()
+        end if
+
+        ok = c_associated(this % ptr) .and. &
+             c_associated( old % ptr) .and. &
+             c_associated( new % ptr)
+
+        if (ok) then
+            pos = 1
+            old_size = old % size()
+            do while (.true.) 
+                pos = this % find(old, pos)
+                if (pos == 0) then
+                    exit
+                end if
+                call this % erase(pos, old_size)
+                call this % insert(pos, new)
+                pos = pos + old_size
+                cnt_ = cnt_ - 1
+                if (cnt_ == 0) then
+                    exit
+                end if
+            end do
+        end if
+
+    end subroutine string_replace
 
 
     ! Utility subroutines/functions

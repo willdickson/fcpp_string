@@ -152,16 +152,18 @@ size_t string_find(std::string *s0, std::string *s1, size_t pos)
     {
         rval = s0 -> find(*s1, pos);
     }
+    return rval;
 }
 
 
-size_t string_find_from_char(std::string *s0, char c[], size_t pos)
+size_t string_find_from_char(std::string *s, char c[], size_t pos)
 {
     size_t rval = std::string::npos;
-    if (s0 != nullptr) 
+    if (s != nullptr) 
     {
-        rval = s0 -> find(c, pos);
+        rval = s -> find(c, pos);
     }
+    return rval;
 }
 
 
@@ -172,15 +174,17 @@ size_t string_rfind(std::string *s0, std::string *s1, size_t pos)
     {
         rval = s0 -> rfind(*s1, pos);
     }
+    return rval;
 }
 
 
-size_t string_rfind_from_char(std::string *s0, char c[], size_t pos)
+size_t string_rfind_from_char(std::string *s, char c[], size_t pos)
 {
     size_t rval = std::string::npos;
-    if (s0 != nullptr) 
+    if (s != nullptr) 
     {
-        rval = s0 -> rfind(c, pos);
+        rval = s -> rfind(c, pos);
     }
+    return rval;
 }
 
