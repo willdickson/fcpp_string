@@ -38,7 +38,8 @@ module cpp_string_m
         type(c_ptr) :: ptr = c_null_ptr
     contains
         private
-        procedure, public :: size          => string_size
+        procedure, public :: size          => string_size, &
+                                              string_size_int
         procedure, public :: to_character  => string_to_character
         procedure, public :: clear         => string_clear
         procedure, public :: compare       => string_compare
@@ -172,6 +173,17 @@ contains
             val = 0
         end if
     end function string_size
+
+
+    function string_size_int(this) result(val)
+        class(string_t), intent(in) :: this
+        integer                     :: val
+        if (c_associated(this % ptr)) then
+            val = int(string_size_c(this % ptr),kind=kind(val))
+        else
+            val = 0
+        end if
+    end function string_size_int
 
 
     function string_at_size_t(this, n) result(val)
