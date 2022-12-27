@@ -1,4 +1,4 @@
-module string_iface
+module string_cdef
 
     use, intrinsic :: iso_c_binding,  only : c_ptr
     use, intrinsic :: iso_c_binding,  only : c_int
@@ -229,4 +229,4 @@ module string_iface
     end interface
 
 
-end module string_iface
+end module string_cdef

@@ -9,25 +9,25 @@ module cpp_string_m
     use, intrinsic :: iso_c_binding,  only : c_null_ptr
     use, intrinsic :: iso_c_binding,  only : c_associated
 
-    use string_iface, only : string_new_empty_c
-    use string_iface, only : string_new_from_char_c
-    use string_iface, only : string_new_from_ptr_c
-    use string_iface, only : string_delete_c
-    use string_iface, only : string_size_c
-    use string_iface, only : string_at_c
-    use string_iface, only : string_clear_c
-    use string_iface, only : string_append_c
-    use string_iface, only : string_append_from_char_c
-    use string_iface, only : string_push_back_c
-    use string_iface, only : string_pop_back_c
-    use string_iface, only : string_compare_c
-    use string_iface, only : string_empty_c
-    use string_iface, only : string_erase_c
-    use string_iface, only : string_insert_c
-    use string_iface, only : string_find_c
-    use string_iface, only : string_find_from_char_c
-    use string_iface, only : string_rfind_c
-    use string_iface, only : string_rfind_from_char_c
+    use string_cdef, only : string_new_empty_c
+    use string_cdef, only : string_new_from_char_c
+    use string_cdef, only : string_new_from_ptr_c
+    use string_cdef, only : string_delete_c
+    use string_cdef, only : string_size_c
+    use string_cdef, only : string_at_c
+    use string_cdef, only : string_clear_c
+    use string_cdef, only : string_append_c
+    use string_cdef, only : string_append_from_char_c
+    use string_cdef, only : string_push_back_c
+    use string_cdef, only : string_pop_back_c
+    use string_cdef, only : string_compare_c
+    use string_cdef, only : string_empty_c
+    use string_cdef, only : string_erase_c
+    use string_cdef, only : string_insert_c
+    use string_cdef, only : string_find_c
+    use string_cdef, only : string_find_from_char_c
+    use string_cdef, only : string_rfind_c
+    use string_cdef, only : string_rfind_from_char_c
 
     implicit none
     private
