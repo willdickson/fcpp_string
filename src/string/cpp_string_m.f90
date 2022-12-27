@@ -348,10 +348,10 @@ contains
 
 
     function string_equals(this, that) result(rval)
-        class(string_t), intent(in) :: this
-        type(string_t),  intent(in) :: that
-        logical                     :: rval
-        integer(c_int)              :: comp
+        class(string_t), intent(in)  :: this
+        type(string_t),  intent(in)  :: that
+        logical                      :: rval
+        integer(c_int)               :: comp
         if (this % compare(that) == 0) then
             rval = .true.
         else
@@ -361,10 +361,10 @@ contains
 
 
     function string_not_equals(this, that) result(rval)
-        class(string_t), intent(in) :: this
-        type(string_t),  intent(in) :: that
-        logical                     :: rval
-        integer(c_int)              :: comp
+        class(string_t), intent(in)  :: this
+        type(string_t),  intent(in)  :: that
+        logical                      :: rval
+        integer(c_int)               :: comp
         if (this % compare(that) == 0) then
             rval = .false.
         else

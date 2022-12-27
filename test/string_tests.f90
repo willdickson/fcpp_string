@@ -19,11 +19,53 @@ contains
     subroutine collect_string_tests(testsuite)
         type(unittest_type), allocatable, intent(out) :: testsuite(:)
         testsuite = [  & 
-            new_unittest('test size', test_size), &
+            new_unittest('test constructor',  test_constructor),  &
+            new_unittest('test size',         test_size),         &
             new_unittest('test to_character', test_to_character), &
-            new_unittest('test clear', test_clear) &
+            new_unittest('test clear',        test_clear),        &
+            new_unittest('test compare',      test_compare),      &
+            new_unittest('test empty',        test_empty)         &
             ]
     end subroutine collect_string_tests
+
+
+    subroutine test_constructor(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)            :: str1
+        type(string_t)            :: str2
+        type(string_t)            :: str3
+        character(:), allocatable :: chr
+        logical :: tmp
+
+        ! empty constructor
+        str1= string_t()
+        call check(error, str1 % size() == 0)
+
+        ! character constructor
+        chr = 'first test string'
+        str1 = string_t(chr)
+        call check(error, char(str1) == chr)
+        str2 = chr 
+        call check(error, char(str2) == chr)
+        
+        ! string constructor
+        str1 = string_t('second test string')
+        str2 = string_t(str1)
+        str3 = str1
+        call check(error, str1 == str2)
+        if (allocated(error)) return
+        call check(error, char(str1) == char(str2))
+        if (allocated(error)) return
+        call check(error, str1 == str3)
+        if (allocated(error)) return
+
+        ! pointer constructor
+        str1 = string_t('third test string')
+        str2 = string_t(str1 % ptr)
+        call check(error, str1 == str2)
+        if (allocated(error)) return
+
+    end subroutine test_constructor
 
 
     subroutine test_size(error)
@@ -32,12 +74,15 @@ contains
         type(string_t)            :: str
         integer                   :: str_size
         integer(c_size_t)         :: str_c_size 
+
         chr = 'my test string'
         str = string_t(chr)
         str_size = str % size()
         call check(error, str_size == len(chr))
+        if (allocated(error)) return
         str_c_size = str % size()
         call check(error, str_c_size == len(chr))
+        if (allocated(error)) return
     end subroutine test_size
 
 
@@ -48,6 +93,7 @@ contains
         chr = 'this is a test string'
         str = string_t(chr)
         call check(error, chr == str % to_character())
+        if (allocated(error)) return
     end subroutine test_to_character
 
 
@@ -57,7 +103,57 @@ contains
         str = string_t('this is a string')
         call str % clear()
         call check(error, str % size() == 0)
+        if (allocated(error)) return
     end subroutine test_clear
+
+
+    subroutine test_compare(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t) :: str1
+        type(string_t) :: str2
+        integer        :: comp 
+
+        ! Check equals
+        str1 = 'a test string'
+        str2 = 'a test string'
+        comp = str1 % compare(str2)
+        call check(error, comp == 0)
+        if (allocated(error)) return
+
+        ! Check less than
+        str1 = 'aabcde'
+        str2 = 'abdcde'
+        comp = str1 % compare(str2)
+        call check(error, comp < 0)
+        if (allocated(error)) return
+
+        ! Check greater than
+        str1 = 'abbcde'
+        str2 = 'aadcde'
+        comp = str1 % compare(str2)
+        call check(error, comp > 0)
+        if (allocated(error)) return
+    end subroutine test_compare
+
+
+    subroutine test_empty(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t) :: str
+
+        ! Unallocated string
+        call check(error, str % empty())
+        if (allocated(error)) return
+
+        ! Allocated empty string
+        str = string_t()
+        call check(error, str % empty())
+        if (allocated(error)) return
+
+        ! A nonmpty string
+        str = string_t('a test string')
+        call check(error, .not. str % empty())
+        if (allocated(error)) return
+    end subroutine test_empty
 
 
 
