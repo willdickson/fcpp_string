@@ -1,10 +1,14 @@
-module fcppstring
+module fcpp_string
+
+    use, intrinsic :: iso_c_binding,  only : c_size_t
     use cpp_string_m, only : string_t
     use cpp_string_m, only : char
-    use, intrinsic :: iso_c_binding,  only : c_size_t
+
     implicit none
     private
 
+    public :: string_t
+    public :: char
     public :: test 
 
 contains
@@ -115,4 +119,5 @@ contains
         print '(a,dt,a,dt)', 's1 = ', s1, ', s2 = ', s2
 
     end subroutine test
-end module fcppstring
+
+end module fcpp_string
