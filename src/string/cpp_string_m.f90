@@ -298,7 +298,9 @@ contains
         if (.not. c_associated(this % ptr)) then
             this % ptr = string_new_empty_c()
         end if
-        call string_pop_back_c(this % ptr)
+        if (.not. this % empty()) then
+            call string_pop_back_c(this % ptr)
+        end if
     end subroutine string_pop_back
 
 

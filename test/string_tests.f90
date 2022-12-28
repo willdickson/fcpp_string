@@ -24,7 +24,9 @@ contains
             new_unittest('test to_character', test_to_character), &
             new_unittest('test clear',        test_clear),        &
             new_unittest('test compare',      test_compare),      &
-            new_unittest('test empty',        test_empty)         &
+            new_unittest('test empty',        test_empty),        &
+            new_unittest('test push_back',    test_push_back),    &
+            new_unittest('test pop_back',     test_pop_back)      &
             ]
     end subroutine collect_string_tests
 
@@ -75,11 +77,15 @@ contains
         integer                   :: str_size
         integer(c_size_t)         :: str_c_size 
 
+        call check(error, str % size() == 0)
+        if (allocated(error)) return
+
         chr = 'my test string'
         str = string_t(chr)
         str_size = str % size()
         call check(error, str_size == len(chr))
         if (allocated(error)) return
+
         str_c_size = str % size()
         call check(error, str_c_size == len(chr))
         if (allocated(error)) return
@@ -90,6 +96,8 @@ contains
         type(error_type), allocatable, intent(out) :: error
         character(:), allocatable :: chr
         type(string_t)            :: str
+        call check(error, str % to_character()=='')
+        if (allocated(error)) return
         chr = 'this is a test string'
         str = string_t(chr)
         call check(error, chr == str % to_character())
@@ -100,6 +108,9 @@ contains
     subroutine test_clear(error)
         type(error_type), allocatable, intent(out) :: error
         type(string_t) :: str
+        call str % clear()
+        call check(error, str % size() == 0)
+        if (allocated(error)) return
         str = string_t('this is a string')
         call str % clear()
         call check(error, str % size() == 0)
@@ -112,6 +123,20 @@ contains
         type(string_t) :: str1
         type(string_t) :: str2
         integer        :: comp 
+
+        ! Check for case when neither allocated
+        comp = str1 % compare(str2)
+        call check(error, comp == 0)
+        if (allocated(error)) return
+
+        ! Check for cases when one allocated 
+        str1 = 'a test string'
+        comp = str1 % compare(str2)
+        call check(error, comp > 0)
+        if (allocated(error)) return
+        comp = str2 % compare(str1)
+        call check(error, comp < 0)
+        if (allocated(error)) return
 
         ! Check equals
         str1 = 'a test string'
@@ -155,6 +180,47 @@ contains
         if (allocated(error)) return
     end subroutine test_empty
 
+
+    subroutine test_push_back(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)  :: str
+        call str % push_back('a')
+        call check(error, str == string_t('a'))
+        if (allocated(error)) return
+
+        call str % push_back('bc')
+        call check(error, str == string_t('abc'))
+        if (allocated(error)) return
+    end subroutine test_push_back
+
+    
+    subroutine test_pop_back(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)  :: str
+
+        ! Check when string unallocate
+        call str % pop_back()
+        call check(error, str == string_t(''))
+        if (allocated(error)) return
+
+        ! Pop until emtpy check as we go
+        str = 'abc'
+        call str % pop_back()
+        call check(error, str == string_t('ab'))
+        if (allocated(error)) return
+
+        call str % pop_back()
+        call check(error, str == string_t('a'))
+        if (allocated(error)) return
+
+        call str % pop_back()
+        call check(error, str == string_t(''))
+        if (allocated(error)) return
+
+        call str % pop_back()
+        call check(error, str == string_t(''))
+        if (allocated(error)) return
+    end subroutine test_pop_back
 
 
 end module string_tests
