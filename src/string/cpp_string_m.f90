@@ -73,9 +73,12 @@ module cpp_string_m
         procedure         :: string_add
         procedure         :: string_add_char
         procedure, pass(this) :: char_add_string
-        generic,   public :: operator(+)   =>  string_add, &
-                                               string_add_char, &
-                                               char_add_string
+        generic,   public :: operator(+)   => string_add, &
+                                              string_add_char, &
+                                              char_add_string
+        generic,   public :: operator(//)  => string_add, &
+                                              string_add_char, &
+                                              char_add_string
         procedure         :: string_copy
         procedure         :: string_copy_from_char
 
@@ -105,6 +108,10 @@ module cpp_string_m
         generic,   public :: operator(==)  => string_equals
         procedure         :: string_not_equals
         generic,   public :: operator(/=)  => string_not_equals
+
+
+
+        procedure, public :: initialized   => string_initialized 
 
         procedure         :: string_write_formatted
         generic,   public :: write(formatted)  => string_write_formatted
@@ -477,9 +484,6 @@ contains
             pos_ = max(pos, 1)
             pos_ = min(pos_, this % size() +1)
             call string_insert_c(this % ptr, pos_-1, str % ptr)
-            !if (pos_-1 <= this % size()) then
-            !    call string_insert_c(this % ptr, pos_-1, str % ptr)
-            !end if
         end if
     end subroutine string_insert
 
@@ -697,6 +701,13 @@ contains
             call this % string_replace(string_t(old), string_t(new))
         end if
     end subroutine string_replace_from_char
+
+
+    function string_initialized(this) result(rval)
+        class(string_t), intent(in) :: this
+        logical                     :: rval
+        rval = c_associated(this % ptr)
+    end function string_initialized
 
 
     subroutine string_write_formatted(this, unit, iotype, v_list, iostat, iomsg)

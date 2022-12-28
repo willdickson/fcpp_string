@@ -29,7 +29,9 @@ contains
             new_unittest('test pop_back',     test_pop_back),     &
             new_unittest('test append',       test_append),       &
             new_unittest('test erase',        test_erase),        &
-            new_unittest('test insert',       test_insert)        &
+            new_unittest('test insert',       test_insert),       &
+            new_unittest('test add',          test_add),          &
+            new_unittest('test_concat',       test_concat)        &
             ]
     end subroutine collect_string_tests
 
@@ -127,12 +129,12 @@ contains
         type(string_t) :: str2
         integer        :: comp 
 
-        ! Check for case when neither allocated
+        ! Check for case when neither string is initialized 
         comp = str1 % compare(str2)
         call check(error, comp == 0)
         if (allocated(error)) return
 
-        ! Check for cases when one allocated 
+        ! Check for cases when one is not initialized 
         str1 = 'a test string'
         comp = str1 % compare(str2)
         call check(error, comp > 0)
@@ -141,21 +143,21 @@ contains
         call check(error, comp < 0)
         if (allocated(error)) return
 
-        ! Check equals
+        ! Check case when strings are equal
         str1 = 'a test string'
         str2 = 'a test string'
         comp = str1 % compare(str2)
         call check(error, comp == 0)
         if (allocated(error)) return
 
-        ! Check less than
+        ! Check less than case
         str1 = 'aabcde'
         str2 = 'abdcde'
         comp = str1 % compare(str2)
         call check(error, comp < 0)
         if (allocated(error)) return
 
-        ! Check greater than
+        ! Check greater than case
         str1 = 'abbcde'
         str2 = 'aadcde'
         comp = str1 % compare(str2)
@@ -168,16 +170,16 @@ contains
         type(error_type), allocatable, intent(out) :: error
         type(string_t) :: str
 
-        ! Unallocated string
+        ! Check uninitialized string 
         call check(error, str % empty())
         if (allocated(error)) return
 
-        ! Allocated empty string
+        ! Check initialized empty string
         str = string_t()
         call check(error, str % empty())
         if (allocated(error)) return
 
-        ! A nonmpty string
+        ! Check nonempty string
         str = string_t('a test string')
         call check(error, .not. str % empty())
         if (allocated(error)) return
@@ -201,7 +203,7 @@ contains
         type(error_type), allocatable, intent(out) :: error
         type(string_t)  :: str
 
-        ! Check when string unallocate
+        ! Check for uninitialized string 
         call str % pop_back()
         call check(error, str == string_t(''))
         if (allocated(error)) return
@@ -296,9 +298,9 @@ contains
         type(string_t)              :: str_insert
         type(string_t)              :: str_initial
         type(string_t), allocatable :: str_results(:)
-        integer :: i
+        integer                     :: i
 
-        ! Insert into unallocated string
+        ! Insert into uninitialized string
         call str % insert(1,string_t('abcdef'))
         call check(error, str == string_t('abcdef'))
         if (allocated(error)) return
@@ -325,5 +327,76 @@ contains
     end subroutine test_insert
 
 
+    subroutine test_add(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)            :: str1
+        type(string_t)            :: str2
+        type(string_t)            :: str3
+
+        ! Test adding uninitialized strings
+        str3 = str1 + str2
+        call check(error, str3 == string_t(''))
+        if (allocated(error)) return
+        call check(error, str3 % initialized())
+        if (allocated(error)) return
+
+        ! Test adding where one is uninitialized
+        str1 = 'bob'
+        str3 = str1 + str2
+        call check(error, str3 == string_t('bob'))
+        if (allocated(error)) return
+
+        ! Test adding where both initialized
+        str1 = 'this'
+        str2 = 'that'
+        str3 = str1 + str2 
+        call check(error, str3 == string_t('thisthat'))
+        if (allocated(error)) return
+
+        ! Test adding characters
+        str1 = 'one'
+        str3 = str1 + ',' + 'two' + ',' + 'three'
+        call check(error, str3 == string_t('one,two,three'))
+        if (allocated(error)) return
+        str1 = 'one,'
+        str3 = str1 + 'two,' + 'three'
+        call check(error, str3 == string_t('one,two,three'))
+        if (allocated(error)) return
+    end subroutine test_add
+
+
+    subroutine test_concat(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)            :: str1
+        type(string_t)            :: str2
+        type(string_t)            :: str3
+
+        ! Test for  uninitialized strings
+        str3 = str1//str2
+        call check(error, str3 == string_t(''))
+        if (allocated(error)) return
+        call check(error, str3 % initialized())
+        if (allocated(error)) return
+
+        ! Test where one is uninitialized
+        str1 = 'bob'
+        str3 = str1//str2
+        call check(error, str3 == string_t('bob'))
+        if (allocated(error)) return
+
+        ! Test where both initialized
+        str1 = 'this'
+        str2 = 'that'
+        str3 = str1//str2 
+        call check(error, str3 == string_t('thisthat'))
+        if (allocated(error)) return
+
+        !Test with mixed with characters and strings
+        str1 = 'rufus,'
+        str2 = 'charlie,'
+        str3 = 'bob,'//str1//str2//'flash'
+        call check(error, str3 == string_t('bob,rufus,charlie,flash'))
+        if (allocated(error)) return
+    end subroutine test_concat
 
 end module string_tests
