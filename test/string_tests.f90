@@ -28,7 +28,8 @@ contains
             new_unittest('test push_back',    test_push_back),    &
             new_unittest('test pop_back',     test_pop_back),     &
             new_unittest('test append',       test_append),       &
-            new_unittest('test erase',        test_erase)         &
+            new_unittest('test erase',        test_erase),        &
+            new_unittest('test insert',       test_insert)        &
             ]
     end subroutine collect_string_tests
 
@@ -287,6 +288,26 @@ contains
         call check(error, str == string_t('123456789'))
         if (allocated(error)) return
     end subroutine test_erase
+
+
+    subroutine test_insert(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)  :: str
+
+        call str % insert(1,string_t('abcdef'))
+        call check(error, str == string_t('abcdef'))
+        if (allocated(error)) return
+
+        call str % clear()
+        call str % insert(1,'abcd')
+        call check(error, str == string_t('abcd'))
+        if (allocated(error)) return
+
+        ! ------------------------
+        ! NOT DONE
+        ! ------------------------
+    end subroutine test_insert
+
 
 
 end module string_tests

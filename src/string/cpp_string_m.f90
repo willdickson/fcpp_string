@@ -64,9 +64,12 @@ module cpp_string_m
                                               string_at_integer
         procedure         :: string_insert
         procedure         :: string_insert_at_int
+        procedure         :: string_insert_from_char
+        procedure         :: string_insert_from_char_at_int
         generic,   public :: insert        => string_insert, &
-                                              string_insert_at_int
-
+                                              string_insert_at_int, &
+                                              string_insert_from_char, &
+                                              string_insert_from_char_at_int 
         procedure         :: string_add
         procedure         :: string_add_char
         procedure, pass(this) :: char_add_string
@@ -463,16 +466,18 @@ contains
 
 
     subroutine string_insert(this, pos, str)
-        class(string_t), intent(inout) :: this
-        integer(c_size_t), intent(in)  :: pos
-        type(string_t), intent(in)     :: str 
-        integer(c_size_t)              :: pos_c
+        class(string_t),   intent(inout) :: this
+        integer(c_size_t), intent(in)    :: pos
+        type(string_t),    intent(in)    :: str 
+        integer(c_size_t)                :: pos_
         if (.not. c_associated(this % ptr)) then
             this % ptr = string_new_empty_c()
         end if
         if (c_associated(str % ptr)) then 
-            pos_c = max(pos-1, 0)
-            call string_insert_c(this % ptr, pos_c, str % ptr)
+            pos_ = max(pos, 1)
+            if (pos_ < str % size()) then
+                call string_insert_c(this % ptr, pos_-1, str % ptr)
+            end if
         end if
     end subroutine string_insert
 
@@ -485,6 +490,23 @@ contains
         pos_ = int(pos, kind=c_size_t)
         call this % string_insert(pos_, str)
     end subroutine string_insert_at_int
+
+
+    subroutine string_insert_from_char(this, pos, chr)
+        class(string_t),   intent(inout) :: this
+        integer(c_size_t), intent(in)    :: pos
+        character(*),      intent(in)    :: chr 
+        call this % string_insert(pos, string_t(chr))
+    end subroutine string_insert_from_char
+
+
+    subroutine string_insert_from_char_at_int(this, pos, chr)
+        class(string_t), intent(inout) :: this
+        integer,         intent(in)    :: pos
+        character(*),    intent(in)    :: chr 
+        integer(c_size_t)              :: pos_
+        call this % string_insert_at_int(pos, string_t(chr))
+    end subroutine string_insert_from_char_at_int
 
 
     function string_find(this, str, pos) result(rval)
