@@ -475,9 +475,11 @@ contains
         end if
         if (c_associated(str % ptr)) then 
             pos_ = max(pos, 1)
-            if (pos_ < str % size()) then
-                call string_insert_c(this % ptr, pos_-1, str % ptr)
-            end if
+            pos_ = min(pos_, this % size() +1)
+            call string_insert_c(this % ptr, pos_-1, str % ptr)
+            !if (pos_-1 <= this % size()) then
+            !    call string_insert_c(this % ptr, pos_-1, str % ptr)
+            !end if
         end if
     end subroutine string_insert
 

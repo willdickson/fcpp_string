@@ -292,20 +292,36 @@ contains
 
     subroutine test_insert(error)
         type(error_type), allocatable, intent(out) :: error
-        type(string_t)  :: str
+        type(string_t)              :: str
+        type(string_t)              :: str_insert
+        type(string_t)              :: str_initial
+        type(string_t), allocatable :: str_results(:)
+        integer :: i
 
+        ! Insert into unallocated string
         call str % insert(1,string_t('abcdef'))
         call check(error, str == string_t('abcdef'))
         if (allocated(error)) return
 
+        ! Insert into empty string
         call str % clear()
         call str % insert(1,'abcd')
         call check(error, str == string_t('abcd'))
         if (allocated(error)) return
 
-        ! ------------------------
-        ! NOT DONE
-        ! ------------------------
+        ! Insert at all positions
+        str_insert = 'xy'
+        str_initial = '1234'
+        str_results = [string_t('xy1234'), string_t('1xy234'), & 
+            string_t('12xy34'), string_t('123xy4'), string_t('1234xy')]
+
+        do i = 1, size(str_results) 
+            call str % clear()
+            str = str_initial
+            call str % insert(i,str_insert)
+            call check(error, str == str_results(i))
+            if (allocated(error)) return
+        end do
     end subroutine test_insert
 
 
