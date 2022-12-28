@@ -82,7 +82,9 @@ module cpp_string_m
                                               char_add_string
         procedure         :: string_copy
         procedure         :: string_copy_from_char
-
+        procedure, public :: copy          => string_copy_func
+        generic,   public :: assignment(=) => string_copy, &
+                                              string_copy_from_char
         procedure         :: string_find
         procedure         :: string_find_at_int
         procedure         :: string_find_from_char
@@ -103,20 +105,13 @@ module cpp_string_m
         procedure         :: string_replace_from_char
         generic,   public :: replace       => string_replace, &
                                               string_replace_from_char
-        generic,   public :: assignment(=) => string_copy, &
-                                              string_copy_from_char
         procedure         :: string_equals
         generic,   public :: operator(==)  => string_equals
         procedure         :: string_not_equals
         generic,   public :: operator(/=)  => string_not_equals
-
-
-
         procedure, public :: initialized   => string_initialized 
-
         procedure         :: string_write_formatted
         generic,   public :: write(formatted)  => string_write_formatted
-
         final             :: string_delete
     end type string_t
 
@@ -362,6 +357,13 @@ contains
         character(*),    intent(in)    :: c
         this % ptr = string_new_from_char_c(c//c_null_char)
     end subroutine string_copy_from_char
+
+
+    function string_copy_func(this) result(rval)
+        class(string_t), intent(in) :: this
+        type(string_t)              :: rval
+        rval = this
+    end function string_copy_func
 
 
     function string_equals(this, that) result(rval)

@@ -31,7 +31,8 @@ contains
             new_unittest('test erase',        test_erase),        &
             new_unittest('test insert',       test_insert),       &
             new_unittest('test operator(+)',  test_add),          &
-            new_unittest('test operator(//)', test_concat)        &
+            new_unittest('test operator(//)', test_concat),       &
+            new_unittest('test copy',         test_copy)          &
             ]
     end subroutine collect_string_tests
 
@@ -398,5 +399,22 @@ contains
         call check(error, str3 == string_t('bob,rufus,charlie,flash'))
         if (allocated(error)) return
     end subroutine test_concat
+
+
+    subroutine test_copy(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)  :: str1
+        type(string_t)  :: str2
+
+        str2 = str1 % copy()
+        call check(error, str2 == string_t(''))
+        if (allocated(error)) return
+
+        str1 = 'the test string'
+        str2 = str1 % copy()
+        call check(error, str2 == str1)
+        if (allocated(error)) return
+    end subroutine test_copy
+
 
 end module string_tests
