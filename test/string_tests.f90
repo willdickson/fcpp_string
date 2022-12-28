@@ -26,7 +26,8 @@ contains
             new_unittest('test compare',      test_compare),      &
             new_unittest('test empty',        test_empty),        &
             new_unittest('test push_back',    test_push_back),    &
-            new_unittest('test pop_back',     test_pop_back)      &
+            new_unittest('test pop_back',     test_pop_back),     &
+            new_unittest('test append',       test_append)        &
             ]
     end subroutine collect_string_tests
 
@@ -221,6 +222,24 @@ contains
         call check(error, str == string_t(''))
         if (allocated(error)) return
     end subroutine test_pop_back
+
+
+    subroutine test_append(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)  :: str
+
+        call str % append('a')
+        call check(error, str == string_t('a'))
+        if (allocated(error)) return
+
+        call str % append('b')
+        call check(error, str == string_t('ab'))
+        if (allocated(error)) return
+
+        call str % append('c')
+        call check(error, str == string_t('abc'))
+        if (allocated(error)) return
+    end subroutine test_append
 
 
 end module string_tests
