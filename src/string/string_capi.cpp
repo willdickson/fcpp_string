@@ -122,7 +122,7 @@ void string_erase(std::string *s, size_t pos, size_t len)
 {
     if (s != nullptr) 
     {
-        s -> erase(pos,len);
+        s -> erase(pos, len);
     }
 }
 

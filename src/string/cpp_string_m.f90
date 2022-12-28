@@ -195,7 +195,7 @@ contains
         integer(kind=c_size_t), intent(in) :: n
         character(kind=c_char)             :: val
         if (c_associated(this % ptr)) then
-            val = string_at_c(this % ptr, n-1)
+            val = string_at_c(this % ptr, max(n-1,0))
         else
             val = ''
         end if
@@ -390,8 +390,12 @@ contains
         class(string_t), intent(inout)  :: this
         integer(c_size_t), intent(in)   :: pos
         integer(c_size_t), intent(in)   :: len
+        integer(c_size_t)               :: pos_
+        integer(c_size_t)               :: len_
         if (c_associated(this % ptr)) then
-            call string_erase_c(this % ptr, pos-1, len)
+            pos_ = max(pos, 1)
+            len_ = max(len, 0)
+            call string_erase_c(this % ptr, pos_-1, len_)
         end if
     end subroutine string_erase
 
@@ -401,14 +405,16 @@ contains
         integer, intent(in), optional   :: pos
         integer(c_size_t), intent(in)   :: len
         integer(c_size_t)               :: pos_
+        integer(c_size_t)               :: len_
         if (present(pos)) then
             pos_ = int(pos, kind=c_size_t)
         else
             pos_ = 1_c_size_t
         end if
-
         if (c_associated(this % ptr)) then
-            call string_erase_c(this % ptr, pos_-1, len)
+            pos_ = max(pos_, 1)
+            len_ = max(len, 0)
+            call string_erase_c(this % ptr, pos_-1, len_)
         end if
     end subroutine string_erase_at_int1
 
@@ -417,15 +423,17 @@ contains
         class(string_t), intent(inout)  :: this
         integer(c_size_t), intent(in)   :: pos
         integer, intent(in), optional   :: len
+        integer(c_size_t)               :: pos_
         integer(c_size_t)               :: len_
         if (present(len)) then
-            len_ = int(len, kind=c_size_t)
+            len_ = int(max(len,0), kind=c_size_t)
         else
             len_ = this % size()
         end if
-
         if (c_associated(this % ptr)) then
-            call string_erase_c(this % ptr, pos-1, len_)
+            pos_ = max(pos, 1)
+            len_ = max(len_, 0)
+            call string_erase_c(this % ptr, pos_-1, len_)
         end if
     end subroutine string_erase_at_int2
 
@@ -447,6 +455,8 @@ contains
             else
                 len_ = this % size()
             end if
+            pos_ = max(pos_, 1)
+            len_ = max(len_, 0)
             call string_erase_c(this % ptr, pos_-1, len_)
         end if
     end subroutine string_erase_at_int12

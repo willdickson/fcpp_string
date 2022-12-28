@@ -27,7 +27,8 @@ contains
             new_unittest('test empty',        test_empty),        &
             new_unittest('test push_back',    test_push_back),    &
             new_unittest('test pop_back',     test_pop_back),     &
-            new_unittest('test append',       test_append)        &
+            new_unittest('test append',       test_append),       &
+            new_unittest('test erase',        test_erase)         &
             ]
     end subroutine collect_string_tests
 
@@ -240,6 +241,52 @@ contains
         call check(error, str == string_t('abc'))
         if (allocated(error)) return
     end subroutine test_append
+
+
+    subroutine test_erase(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)  :: str
+
+        str = string_t('123456789')
+        call str % erase(5,0)
+        call check(error, str == string_t('123456789'))
+        if (allocated(error)) return
+
+        str = string_t('123456789')
+        call str % erase(5,1)
+        call check(error, str == string_t('12346789'))
+        if (allocated(error)) return
+
+        str = string_t('123456789')
+        call str % erase(6,3)
+        call check(error, str == string_t('123459'))
+        if (allocated(error)) return
+
+        str = string_t('123456789')
+        call str % erase(1,5)
+        call check(error, str == string_t('6789'))
+        if (allocated(error)) return
+
+        str = string_t('123456789')
+        call str % erase(1,20)
+        call check(error, str == string_t(''))
+        if (allocated(error)) return
+
+        str = string_t('123456789')
+        call str % erase(-1,2)
+        call check(error, str == string_t('3456789'))
+        if (allocated(error)) return
+
+        str = string_t('123456789')
+        call str % erase(1,-2)
+        call check(error, str == string_t('123456789'))
+        if (allocated(error)) return
+
+        str = string_t('123456789')
+        call str % erase(-1,-2)
+        call check(error, str == string_t('123456789'))
+        if (allocated(error)) return
+    end subroutine test_erase
 
 
 end module string_tests
