@@ -30,8 +30,8 @@ contains
             new_unittest('test append',       test_append),       &
             new_unittest('test erase',        test_erase),        &
             new_unittest('test insert',       test_insert),       &
-            new_unittest('test add',          test_add),          &
-            new_unittest('test_concat',       test_concat)        &
+            new_unittest('test operator(+)',  test_add),          &
+            new_unittest('test operator(//)', test_concat)        &
             ]
     end subroutine collect_string_tests
 

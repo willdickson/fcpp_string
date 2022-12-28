@@ -33,6 +33,7 @@ module cpp_string_m
     private
 
     public :: char
+    public :: len
 
     type, public :: string_t
         type(c_ptr) :: ptr = c_null_ptr
@@ -120,8 +121,12 @@ module cpp_string_m
     end type string_t
 
     interface char
-        procedure :: string_to_char
+        procedure :: string_char
     end interface
+
+    interface len
+        procedure :: string_len
+    end interface len
 
 
     interface string_t
@@ -730,12 +735,18 @@ contains
     ! Utility subroutines/functions
     ! --------------------------------------------------------------------------
 
-    function string_to_char(string) result(chrstr)
-        type(string_t), intent(in) :: string
-        character(:), allocatable  :: chrstr 
-        chrstr = string % to_character()
-    end function string_to_char
+    function string_char(str) result(chr)
+        type(string_t), intent(in) :: str
+        character(:), allocatable  :: chr 
+        chr = str % to_character()
+    end function string_char
 
+
+    function string_len(str) result(rval)
+        type(string_t), intent(in) :: str
+        integer                    :: rval
+        rval = str % size()
+    end function string_len
 
 end module cpp_string_m
 
