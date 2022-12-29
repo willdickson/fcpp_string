@@ -34,7 +34,8 @@ contains
             new_unittest('test operator(//)',  test_concat),       &
             new_unittest('test copy',          test_copy),         &
             new_unittest('test assignment(=)', test_assignment),   &
-            new_unittest('test find',          test_find)          &
+            new_unittest('test find',          test_find),         &
+            new_unittest('test rfind',         test_rfind)         &
             ]
     end subroutine collect_string_tests
 
@@ -529,5 +530,93 @@ contains
         if (allocated(error)) return
     end subroutine test_find
 
+
+    subroutine test_rfind(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)    :: str
+        integer           :: loc 
+        integer(c_size_t) :: loc_c
+
+        ! Test on uninitialized string w/o pos arg
+        loc = str % rfind('this')
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc_c = str % rfind('that')
+        call check(error, loc_c == 0)
+        if (allocated(error)) return
+
+        ! Test on uninitialized string w/ pos arg
+        loc = str % rfind('this', pos=5)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc = str % rfind('this', pos=-11)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc_c = str % rfind('that',pos=33)
+        call check(error, loc_c == 0)
+        if (allocated(error)) return
+
+        loc_c = str % rfind('that',pos=-15)
+        call check(error, loc_c == 0)
+        if (allocated(error)) return
+
+        ! Test on initialized string w/o pos arg
+        str = 'bob4bob89'
+
+        loc = str % rfind('bob')
+        call check(error, loc == 5)
+        if (allocated(error)) return
+
+        loc_c = str % rfind('bob')
+        call check(error, loc_c == 5)
+        if (allocated(error)) return
+
+        loc = str % rfind('alan')
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc_c = str % rfind('alan')
+        call check(error, loc_c == 0)
+        if (allocated(error)) return
+
+        ! Test on initialized string w/ pos arg
+        str = '12alan789alan45'
+
+        loc = str % rfind('bob',pos=13)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc = str % rfind('alan',pos=14)
+        call check(error, loc == 10)
+        if (allocated(error)) return
+
+        loc = str % rfind('alan',pos=16)
+        call check(error, loc == 10)
+        if (allocated(error)) return
+
+        loc = str % rfind('alan',pos=10)
+        call check(error, loc == 10)
+        if (allocated(error)) return
+
+        loc = str % rfind('alan',pos=8)
+        call check(error, loc == 3)
+        if (allocated(error)) return
+
+        loc = str % rfind('alan',pos=4)
+        call check(error, loc == 3)
+        if (allocated(error)) return
+
+        loc = str % rfind('alan',pos=2)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc = str % rfind('alan',pos=-5)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+    end subroutine test_rfind
 
 end module string_tests
