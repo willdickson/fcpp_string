@@ -485,8 +485,16 @@ contains
         call check(error, loc == 5)
         if (allocated(error)) return
 
+        loc_c = str % find('bob')
+        call check(error, loc_c == 5)
+        if (allocated(error)) return
+
         loc = str % find('alan')
         call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc_c = str % find('alan')
+        call check(error, loc_c == 0)
         if (allocated(error)) return
 
         ! Test on initialized string w/ pos arg
@@ -514,6 +522,10 @@ contains
 
         loc = str % find('alan',pos=21)
         call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc = str % find('alan',pos=-5)
+        call check(error, loc == 6)
         if (allocated(error)) return
     end subroutine test_find
 
