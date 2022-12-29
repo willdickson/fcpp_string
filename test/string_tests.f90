@@ -19,20 +19,22 @@ contains
     subroutine collect_string_tests(testsuite)
         type(unittest_type), allocatable, intent(out) :: testsuite(:)
         testsuite = [  & 
-            new_unittest('test constructor',  test_constructor),  &
-            new_unittest('test size',         test_size),         &
-            new_unittest('test to_character', test_to_character), &
-            new_unittest('test clear',        test_clear),        &
-            new_unittest('test compare',      test_compare),      &
-            new_unittest('test empty',        test_empty),        &
-            new_unittest('test push_back',    test_push_back),    &
-            new_unittest('test pop_back',     test_pop_back),     &
-            new_unittest('test append',       test_append),       &
-            new_unittest('test erase',        test_erase),        &
-            new_unittest('test insert',       test_insert),       &
-            new_unittest('test operator(+)',  test_add),          &
-            new_unittest('test operator(//)', test_concat),       &
-            new_unittest('test copy',         test_copy)          &
+            new_unittest('test constructor',   test_constructor),  &
+            new_unittest('test size',          test_size),         &
+            new_unittest('test to_character',  test_to_character), &
+            new_unittest('test clear',         test_clear),        &
+            new_unittest('test compare',       test_compare),      &
+            new_unittest('test empty',         test_empty),        &
+            new_unittest('test push_back',     test_push_back),    &
+            new_unittest('test pop_back',      test_pop_back),     &
+            new_unittest('test append',        test_append),       &
+            new_unittest('test erase',         test_erase),        &
+            new_unittest('test insert',        test_insert),       &
+            new_unittest('test operator(+)',   test_add),          &
+            new_unittest('test operator(//)',  test_concat),       &
+            new_unittest('test copy',          test_copy),         &
+            new_unittest('test assignment(=)', test_assignment),   &
+            new_unittest('test find',          test_find)          &
             ]
     end subroutine collect_string_tests
 
@@ -406,15 +408,114 @@ contains
         type(string_t)  :: str1
         type(string_t)  :: str2
 
+        ! Test uninitialized string
         str2 = str1 % copy()
         call check(error, str2 == string_t(''))
         if (allocated(error)) return
 
+        ! Test initialized string
         str1 = 'the test string'
         str2 = str1 % copy()
         call check(error, str2 == str1)
         if (allocated(error)) return
     end subroutine test_copy
+
+
+    subroutine test_assignment(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)            :: str1
+        type(string_t)            :: str2
+        character(:), allocatable :: chr
+
+        ! Test uninitialized string
+        str2 = str1
+        call check(error, str2 == string_t(''))
+        if (allocated(error)) return
+
+        ! Test initialized string
+        str1 = 'the test string'
+        str2 = str1
+        call check(error, str2 == str1)
+        if (allocated(error)) return
+
+        ! Test character
+        chr = 'a test string'
+        str2 = chr
+        call check(error, char(str2) == chr)
+        if (allocated(error)) return
+    end subroutine test_assignment
+
+
+    subroutine test_find(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)    :: str
+        integer           :: loc 
+        integer(c_size_t) :: loc_c
+
+        ! Test on uninitialized string w/o pos arg
+        loc = str % find('this')
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc_c = str % find('that')
+        call check(error, loc_c == 0)
+        if (allocated(error)) return
+
+        ! Test on uninitialized string w/ pos arg
+        loc = str % find('this', pos=5)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc = str % find('this', pos=-11)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc_c = str % find('that',pos=33)
+        call check(error, loc_c == 0)
+        if (allocated(error)) return
+
+        loc_c = str % find('that',pos=-15)
+        call check(error, loc_c == 0)
+        if (allocated(error)) return
+
+        ! Test on initialized string w/o pos arg
+        str = '1234bob89'
+
+        loc = str % find('bob')
+        call check(error, loc == 5)
+        if (allocated(error)) return
+
+        loc = str % find('alan')
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        ! Test on initialized string w/ pos arg
+        str = '12345alan01234'
+
+        loc = str % find('bob',pos=3)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc = str % find('alan',pos=3)
+        call check(error, loc == 6)
+        if (allocated(error)) return
+
+        loc = str % find('alan',pos=6)
+        call check(error, loc == 6)
+        if (allocated(error)) return
+
+        loc = str % find('alan',pos=7)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc = str % find('alan',pos=9)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+
+        loc = str % find('alan',pos=21)
+        call check(error, loc == 0)
+        if (allocated(error)) return
+    end subroutine test_find
 
 
 end module string_tests
