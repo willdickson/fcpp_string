@@ -1,13 +1,13 @@
 module string_tests 
 
     use, intrinsic :: iso_c_binding, only : c_size_t
-
     use testdrive,   only : new_unittest 
     use testdrive,   only : unittest_type 
     use testdrive,   only : error_type 
     use testdrive,   only : check
     use fcpp_string, only : string_t
     use fcpp_string, only : char
+    use fcpp_string, only : len 
 
     implicit none
     private
@@ -39,7 +39,9 @@ contains
             new_unittest('test replace',       test_replace),      &
             new_unittest('test operator(==)',  test_equals),       &
             new_unittest('test operator(/=)',  test_not_equals),   &
-            new_unittest('test initialized',   test_initialized)   &
+            new_unittest('test initialized',   test_initialized),  &
+            new_unittest('test char',          test_char),         &
+            new_unittest('test len',           test_len)           &
             ]
     end subroutine collect_string_tests
 
@@ -869,5 +871,39 @@ contains
         call check(error, str % initialized())
         if (allocated(error)) return
     end subroutine test_initialized
+
+
+    subroutine test_char(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)    :: str
+
+        call check(error, char(str) == '')
+        if (allocated(error)) return
+
+        str = 'bob is your uncle'
+        call check(error, char(str) == 'bob is your uncle')
+        if (allocated(error)) return
+
+        call str % clear()
+        call check(error, char(str) == '')
+        if (allocated(error)) return
+    end subroutine test_char
+
+
+    subroutine test_len(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)    :: str
+
+        call check(error, len(str) == 0)
+        if (allocated(error)) return
+
+        str = string_t()
+        call check(error, len(str) == 0)
+        if (allocated(error)) return
+
+        str = '12345'
+        call check(error, len(str) == 5)
+        if (allocated(error)) return
+    end subroutine test_len
 
 end module string_tests
