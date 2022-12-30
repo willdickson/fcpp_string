@@ -37,7 +37,9 @@ contains
             new_unittest('test find',          test_find),         &
             new_unittest('test rfind',         test_rfind),        &
             new_unittest('test replace',       test_replace),      &
-            new_unittest('test operator(==)',  test_equals)        &
+            new_unittest('test operator(==)',  test_equals),       &
+            new_unittest('test operator(/=)',  test_not_equals),   &
+            new_unittest('test initialized',   test_initialized)   &
             ]
     end subroutine collect_string_tests
 
@@ -775,7 +777,7 @@ contains
     subroutine test_equals(error)
         type(error_type), allocatable, intent(out) :: error
 
-        ! Check both unitialized
+        ! Check case where both unintialized
         block
             type(string_t)    :: str1
             type(string_t)    :: str2
@@ -783,7 +785,7 @@ contains
             if (allocated(error)) return
         end block
 
-        ! Check one initialized, one unitialized
+        ! Check case where one initialized, one unitialized
         block
             type(string_t)    :: str1
             type(string_t)    :: str2
@@ -795,7 +797,7 @@ contains
             if (allocated(error)) return
         end block
 
-        ! Check initialized 
+        ! Check case where both are initialized 
         block
             type(string_t)    :: str1
             type(string_t)    :: str2
@@ -809,7 +811,63 @@ contains
             call check(error, str1==str2)
             if (allocated(error)) return
         end block
-
     end subroutine test_equals
+
+
+    subroutine test_not_equals(error)
+        type(error_type), allocatable, intent(out) :: error
+
+        ! Check case where both uninitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            call check(error, .not. (str1/=str2))
+            if (allocated(error)) return
+        end block
+
+        ! Check case where one initialized, one unitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            str1 = ''
+            call check(error, .not. (str1/=str2))
+            if (allocated(error)) return
+
+            call check(error, .not. (str2/=str1))
+            if (allocated(error)) return
+        end block
+
+        ! Check case where both are initialized 
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            str1 = ''
+            str2 = ''
+            call check(error, .not. (str1/=str2))
+            if (allocated(error)) return
+
+            str1 = 'the cat is tall'
+            str2 = 'all dogs are brown'
+            call check(error, str1/=str2)
+            if (allocated(error)) return
+        end block
+    end subroutine test_not_equals
+
+
+    subroutine test_initialized(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)    :: str
+
+        call check(error, .not. str % initialized())
+        if (allocated(error)) return
+
+        str = string_t()
+        call check(error, str % initialized())
+        if (allocated(error)) return
+
+        str = 'this is a string' 
+        call check(error, str % initialized())
+        if (allocated(error)) return
+    end subroutine test_initialized
 
 end module string_tests
