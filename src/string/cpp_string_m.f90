@@ -679,7 +679,7 @@ contains
             old_size = old % size()
             new_size = new % size()
             pos = 1
-            do while (.true.) 
+            do while (cnt_ > 0) 
                 pos = this % find(old, pos)
                 if (pos == 0) then
                     exit
@@ -688,9 +688,6 @@ contains
                 call this % insert(pos, new)
                 pos = pos + new_size
                 cnt_ = cnt_ - 1
-                if (cnt_ == 0) then
-                    exit
-                end if
             end do
         end if
 

@@ -35,7 +35,8 @@ contains
             new_unittest('test copy',          test_copy),         &
             new_unittest('test assignment(=)', test_assignment),   &
             new_unittest('test find',          test_find),         &
-            new_unittest('test rfind',         test_rfind)         &
+            new_unittest('test rfind',         test_rfind),        &
+            new_unittest('test replace',       test_replace)       &
             ]
     end subroutine collect_string_tests
 
@@ -618,5 +619,155 @@ contains
         if (allocated(error)) return
 
     end subroutine test_rfind
+
+
+    subroutine test_replace(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)    :: str1
+        type(string_t)    :: str2
+        type(string_t)    :: str3
+
+
+        ! Check case where all string are uninitialized
+        block 
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            type(string_t)    :: str3
+            call str1 % replace(str2, str3)
+            call check(error, str1 == string_t(''))
+            if (allocated(error)) return
+        end block
+
+        ! Check case where str1, str1 uninitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            type(string_t)    :: str3
+            str3 = 'a string'
+            call str1 % replace(str2, str3)
+            call check(error, str1 == string_t(''))
+            if (allocated(error)) return
+        end block
+
+        ! Check case where str1, str3  uninitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            type(string_t)    :: str3
+            str2 = 'a string'
+            call str1 % replace(str2, str3)
+            call check(error, str1 == string_t(''))
+            if (allocated(error)) return
+        end block
+            
+        ! Check case where str2, str3  uninitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            type(string_t)    :: str3
+            type(string_t)    :: str4
+            str1 = 'a string'
+            str4 = str1
+            call str1 % replace(str2, str3)
+            call check(error, str1 == str4)
+            if (allocated(error)) return
+        end block
+
+        ! Check case where str1 uninitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            type(string_t)    :: str3
+            str2 = 'this'
+            str3 = 'that'
+            call str1 % replace(str2, str3)
+            call check(error, str1 == string_t(''))
+            if (allocated(error)) return
+        end block
+
+        ! Check case where str2 uninitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            type(string_t)    :: str3
+            type(string_t)    :: str4
+            str1 = 'this'
+            str4 = str1
+            str3 = 'that'
+            call str1 % replace(str2, str3)
+            call check(error, str1 == str4)
+            if (allocated(error)) return
+        end block
+
+        ! Check case where str3 uninitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            type(string_t)    :: str3
+            type(string_t)    :: str4
+            str1 = 'this'
+            str4 = str1
+            str2 = 'that'
+            call str1 % replace(str2, str3)
+            call check(error, str1 == str4)
+            if (allocated(error)) return
+        end block
+
+        ! Check case where all initialized, but not found
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            type(string_t)    :: str3
+            type(string_t)    :: str4
+            str1 = 'nothing to replace here'
+            str4 = str1
+            str2 = 'that'
+            str3 = 'other'
+            call str1 % replace(str2, str3)
+            call check(error, str1 == str4)
+            if (allocated(error)) return
+        end block
+
+        ! Check case where all initialized and we have relacements
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            type(string_t)    :: str3
+            type(string_t)    :: str4
+
+            str1 = 'bob, dave, steve, alan'
+            str2 = ','
+            str3 = ';'
+            str4 = 'bob; dave; steve; alan'
+            call str1 % replace(str2, str3)
+            call check(error, str1 == str4)
+            if (allocated(error)) return
+
+            str1 = 'this is that or this is the other'
+            str2 = 'this'
+            str3 = 'frogger'
+            str4 = 'frogger is that or frogger is the other'
+            call str1 % replace(str2, str3)
+            call check(error, str1 == str4)
+            if (allocated(error)) return
+
+            str1 = 'a string << with << stuff in it << '
+            str2 = '<<'
+            str3 = '{{'
+            str4 = 'a string {{ with {{ stuff in it << '
+            call str1 % replace(str2, str3, 2)
+            call check(error, str1 == str4)
+            if (allocated(error)) return
+
+            str1 = 'a string << with << stuff in it << '
+            str2 = '<<'
+            str3 = '{{'
+            str4 = str1
+            call str1 % replace(str2, str3,-3) 
+            call check(error, str1 == str4)
+            if (allocated(error)) return
+        end block
+
+    end subroutine test_replace
 
 end module string_tests
