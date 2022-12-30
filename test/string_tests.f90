@@ -36,7 +36,8 @@ contains
             new_unittest('test assignment(=)', test_assignment),   &
             new_unittest('test find',          test_find),         &
             new_unittest('test rfind',         test_rfind),        &
-            new_unittest('test replace',       test_replace)       &
+            new_unittest('test replace',       test_replace),      &
+            new_unittest('test operator(==)',  test_equals)        &
             ]
     end subroutine collect_string_tests
 
@@ -769,5 +770,46 @@ contains
         end block
 
     end subroutine test_replace
+
+
+    subroutine test_equals(error)
+        type(error_type), allocatable, intent(out) :: error
+
+        ! Check both unitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            call check(error, str1==str2)
+            if (allocated(error)) return
+        end block
+
+        ! Check one initialized, one unitialized
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            str1 = ''
+            call check(error, str1==str2)
+            if (allocated(error)) return
+
+            call check(error, str2==str1)
+            if (allocated(error)) return
+        end block
+
+        ! Check initialized 
+        block
+            type(string_t)    :: str1
+            type(string_t)    :: str2
+            str1 = ''
+            str2 = ''
+            call check(error, str1==str2)
+            if (allocated(error)) return
+
+            str1 = 'an example string'
+            str2 = 'an example string'
+            call check(error, str1==str2)
+            if (allocated(error)) return
+        end block
+
+    end subroutine test_equals
 
 end module string_tests
