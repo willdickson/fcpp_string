@@ -188,3 +188,15 @@ size_t string_rfind_from_char(std::string *s, char c[], size_t pos)
     return rval;
 }
 
+
+void string_set(std::string *s, size_t pos, char c[1])
+{
+    if (s != nullptr)
+    {
+        if (pos < (s -> size()))
+        {
+            (*s)[pos] = c[0];
+        }
+    }
+}
+

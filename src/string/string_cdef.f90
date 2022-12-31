@@ -15,6 +15,7 @@ module string_cdef
     public :: string_delete_c
     public :: string_size_c
     public :: string_at_c
+    public :: string_set_c
     public :: string_clear_c
     public :: string_append_c
     public :: string_append_from_char_c
@@ -86,6 +87,18 @@ module string_cdef
             integer(kind=c_size_t), intent(in), value  :: n
             character(kind=c_char)                     :: val
         end function string_at_c
+
+
+        subroutine string_set_c(ptr, pos, c) &
+                bind(c, name='string_set')
+            import c_ptr
+            import c_char
+            import c_size_t
+            implicit none
+            type(c_ptr), intent(in), value       :: ptr
+            integer(c_size_t), intent(in), value :: pos
+            character(kind=c_char), intent(in)   :: c(*)
+        end subroutine string_set_c
 
 
         subroutine string_clear_c(ptr) & 

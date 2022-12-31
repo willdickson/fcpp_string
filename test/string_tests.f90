@@ -29,6 +29,8 @@ contains
             new_unittest('test pop_back',      test_pop_back),     &
             new_unittest('test append',        test_append),       &
             new_unittest('test erase',         test_erase),        &
+            new_unittest('test at',            test_at),           &
+            new_unittest('test set',           test_set),          &
             new_unittest('test insert',        test_insert),       &
             new_unittest('test operator(+)',   test_add),          &
             new_unittest('test operator(//)',  test_concat),       &
@@ -300,6 +302,66 @@ contains
         call check(error, str == string_t('123456789'))
         if (allocated(error)) return
     end subroutine test_erase
+
+
+    subroutine test_at(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)  :: str
+        character       :: c
+
+        c = str % at(10)
+        call check(error, c == '')
+        if (allocated(error)) return
+
+        str = ''
+        c = str % at(2)
+        call check(error, c == '')
+        if (allocated(error)) return
+
+        str = 'abcdef'
+        c = str % at(4)
+        call check(error, c=='d')
+        if (allocated(error)) return
+
+        c = str % at(-5)
+        call check(error, c=='')
+        if (allocated(error)) return
+    end subroutine test_at
+
+
+    subroutine test_set(error)
+        type(error_type), allocatable, intent(out) :: error
+        type(string_t)    :: str
+
+        call str % set(3,'x')
+        call check(error, str == string_t(''))
+        if (allocated(error)) return
+
+        str = '123456789'
+        call str % set(2,'x')
+        call check(error, str == string_t('1x3456789'))
+        if (allocated(error)) return
+
+        call str % set(5,'y')
+        call check(error, str == string_t('1x34y6789'))
+        if (allocated(error)) return
+
+        call str % set(9,'z')
+        call check(error, str == string_t('1x34y678z'))
+        if (allocated(error)) return
+
+        call str % set(1,'o')
+        call check(error, str == string_t('ox34y678z'))
+        if (allocated(error)) return
+
+        call str % set(-1,'k')
+        call check(error, str == string_t('ox34y678z'))
+        if (allocated(error)) return
+
+        call str % set(50,'u')
+        call check(error, str == string_t('ox34y678z'))
+        if (allocated(error)) return
+    end subroutine test_set
 
 
     subroutine test_insert(error)

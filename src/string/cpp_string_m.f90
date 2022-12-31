@@ -15,6 +15,7 @@ module cpp_string_m
     use string_cdef, only : string_delete_c
     use string_cdef, only : string_size_c
     use string_cdef, only : string_at_c
+    use string_cdef, only : string_set_c
     use string_cdef, only : string_clear_c
     use string_cdef, only : string_append_c
     use string_cdef, only : string_append_from_char_c
@@ -59,10 +60,14 @@ module cpp_string_m
                                               string_erase_at_int1, &
                                               string_erase_at_int2, &
                                               string_erase_at_int12
-        procedure         :: string_at_size_t
+        procedure         :: string_at
         procedure         :: string_at_integer
-        generic,   public :: at            => string_at_size_t, &
+        generic,   public :: at            => string_at, &
                                               string_at_integer
+        procedure         :: string_set   
+        procedure         :: string_set_at_integer  
+        generic,   public :: set           => string_set, &
+                                              string_set_at_integer
         procedure         :: string_insert
         procedure         :: string_insert_at_int
         procedure         :: string_insert_from_char
@@ -200,24 +205,49 @@ contains
     end function string_size_int
 
 
-    function string_at_size_t(this, n) result(val)
+    function string_at(this, pos) result(val)
         class(string_t),        intent(in) :: this 
-        integer(kind=c_size_t), intent(in) :: n
+        integer(kind=c_size_t), intent(in) :: pos 
         character(kind=c_char)             :: val
+        val = ''
         if (c_associated(this % ptr)) then
-            val = string_at_c(this % ptr, max(n-1,0))
-        else
-            val = ''
+            if ((pos >= 1) .and. (pos <= this % size())) then
+                val = string_at_c(this % ptr, pos-1)
+            end if
         end if
-    end function string_at_size_t
+    end function string_at
 
 
-    function string_at_integer(this, n) result(val)
+    function string_at_integer(this, pos) result(val)
         class(string_t),        intent(in) :: this 
-        integer,                intent(in) :: n
+        integer,                intent(in) :: pos 
         character(kind=c_char)             :: val
-        val = this % at(int(n,kind=c_size_t))
+        integer(c_size_t)                  :: pos_ 
+        pos_  = int(pos,kind=c_size_t)
+        val = this % at(pos_)
     end function string_at_integer
+
+    
+    subroutine string_set(this, pos, c)
+        class(string_t),   intent(inout) :: this
+        integer(c_size_t), intent(in)    :: pos
+        character(*),      intent(in)    :: c
+        if (c_associated(this % ptr)) then
+            if ((pos >= 1) .and. (pos <= this % size())) then
+                call string_set_c(this % ptr, pos-1, c)
+            end if
+        end if
+    end subroutine string_set
+
+
+    subroutine string_set_at_integer(this, pos, c)
+        class(string_t), intent(inout) :: this
+        integer,         intent(in)    :: pos
+        character(*),    intent(in)    :: c
+        integer(c_size_t)              :: pos_
+        pos_ = int(pos, kind=c_size_t)
+        call this % string_set(pos_, c)
+    end subroutine string_set_at_integer
 
 
     function string_to_character(this) result(chrstr)

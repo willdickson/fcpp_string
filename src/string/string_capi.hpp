@@ -42,6 +42,8 @@ extern "C"
     size_t string_rfind(std::string *s0, std::string *s1, size_t pos);
 
     size_t string_rfind_from_char(std::string *s, char c[], size_t pos);
+
+    void string_set(std::string *s, size_t pos, char c[1]);
 }
 
 #endif // STRING_CAPI_HPP
