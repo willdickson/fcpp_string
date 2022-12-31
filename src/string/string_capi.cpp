@@ -1,4 +1,5 @@
 #include "string_capi.hpp"
+#include <iostream>
 
 
 std::string *string_new_empty()

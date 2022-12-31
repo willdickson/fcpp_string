@@ -1,7 +1,6 @@
 #ifndef STRING_CAPI_HPP
 #define STRING_CAPI_HPP
 #include <string>
-#include <iostream>
 
 extern "C" 
 {
