@@ -17,5 +17,8 @@ source-dir = 'test'
 [test.dependencies]
 test-drive.git = "https://github.com/fortran-lang/test-drive.git"
 
+[library]
+source-dir = "src"
+
 [install]
-library = false
+library = true
