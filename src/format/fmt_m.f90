@@ -8,15 +8,17 @@ module fmt_m
     use, intrinsic :: iso_c_binding,  only : c_float
     use, intrinsic :: iso_c_binding,  only : c_double
     use, intrinsic :: iso_c_binding,  only : c_long_double
+    use, intrinsic :: iso_c_binding,  only : c_bool
 
     use cpp_string_m, only : string_t
     use fmt_cdef,     only : fmt_int32_c
     use fmt_cdef,     only : fmt_int64_c
-    use fmt_cdef,     only : fmt_size_c
     use fmt_cdef,     only : fmt_float_c
     use fmt_cdef,     only : fmt_float_with_prec_c
     use fmt_cdef,     only : fmt_double_c
     use fmt_cdef,     only : fmt_double_with_prec_c
+    use fmt_cdef,     only : fmt_bool_c
+    use fmt_cdef,     only : fmt_string_c
 
     implicit none
     private
@@ -34,6 +36,12 @@ module fmt_m
         procedure :: fmt_float_from_char
         procedure :: fmt_double
         procedure :: fmt_double_from_char
+        procedure :: fmt_logical
+        procedure :: fmt_logical_from_char
+        procedure :: fmt_string
+        procedure :: fmt_string_from_char
+        procedure :: fmt_char_from_char
+        procedure :: fmt_char_from_string
     end interface string_fmt
 
 contains
@@ -154,6 +162,83 @@ contains
         res_str = fmt_double(fmt_str, val, prec)
     end function fmt_double_from_char
 
+
+    function fmt_logical(fmt_str, val) result(res_str)
+        type(string_t),    intent(in) :: fmt_str
+        logical,           intent(in) :: val
+        type(string_t)                :: res_str
+        type(string_t)                :: cor_str
+        logical(c_bool)               :: val_c
+        logical                       :: ok
+
+        call correct_fmt_str(fmt_str, cor_str, ok)
+        if (ok) then
+            val_c = logical(val,kind=c_bool)
+            res_str = string_t(fmt_bool_c(cor_str % ptr, val_c))
+        else
+            res_str = cor_str
+        end if
+    end function fmt_logical
+
+
+    function fmt_logical_from_char(fmt_chr, val) result(res_str)
+        character(*),      intent(in) :: fmt_chr
+        logical,           intent(in) :: val
+        type(string_t)                :: res_str
+        type(string_t)                :: fmt_str
+        fmt_str = string_t(fmt_chr)
+        res_str = fmt_logical(fmt_str, val)
+    end function fmt_logical_from_char
+
+
+    function fmt_string(fmt_str, val_str) result(res_str)
+        type(string_t),    intent(in) :: fmt_str
+        type(string_t),    intent(in) :: val_str
+        type(string_t)                :: res_str
+        type(string_t)                :: cor_str
+        logical                       :: ok
+        call correct_fmt_str(fmt_str, cor_str, ok)
+        if (ok) then
+            res_str = string_t(fmt_string_c(cor_str % ptr, val_str % ptr))
+        else
+            res_str = cor_str
+        end if
+    end function fmt_string
+
+
+    function fmt_string_from_char(fmt_chr, val_str) result(res_str)
+        character(*),      intent(in) :: fmt_chr
+        type(string_t),    intent(in) :: val_str
+        type(string_t)                :: res_str
+        type(string_t)                :: fmt_str
+        fmt_str = string_t(fmt_chr)
+        res_str = fmt_string(fmt_str, val_str)
+    end function fmt_string_from_char
+
+
+    function fmt_char_from_string(fmt_str, val_chr) result(res_str)
+        type(string_t),    intent(in) :: fmt_str
+        character(*),      intent(in) :: val_chr
+        type(string_t)                :: res_str
+        type(string_t)                :: val_str
+        val_str = string_t(val_chr)
+        res_str = fmt_string(fmt_str, val_str)
+    end function fmt_char_from_string
+
+
+    function fmt_char_from_char(fmt_chr, val_chr) result(res_str)
+        character(*),      intent(in) :: fmt_chr
+        character(*),      intent(in) :: val_chr
+        type(string_t)                :: res_str
+        type(string_t)                :: fmt_str
+        type(string_t)                :: val_str
+        fmt_str = string_t(fmt_chr)
+        val_str = string_t(val_chr)
+        res_str = fmt_string(fmt_str, val_str)
+    end function fmt_char_from_char
+
+
+    ! ------------------------------------------------------------------------------
 
     subroutine correct_fmt_str(fmt_str, cor_str, ok)
         type(string_t), intent(in)  :: fmt_str

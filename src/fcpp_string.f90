@@ -26,19 +26,22 @@ contains
         real(wp)       :: rval
         integer(ip)    :: ival
         integer        :: i
+        logical        :: flag
 
         do i = 1, 10
             rval = i/3.2
             print *, i, sfmt('val = {2.3f}', rval)
         end do
 
-        ival = 53
-        print *, sfmt('integer = {}', ival)
+        ival = 10000090 
+        print *, sfmt('integer = {#x}', ival)
 
-        print *, 'kind(i)         = ', kind(i) 
-        print *, 'kind(c_int32_t) = ', c_int32_t 
-        print *, 'kind(c_int64_t) = ', c_int64_t 
-        print *, 'kind(c_size_t)  = ', c_size_t 
+        flag = .true.
+        print *, sfmt('flag = |{ ^9}|', flag)
+        flag = .false.
+        print *, sfmt('flag = |{ ^9}|', flag)
+
+        print *, sfmt('string {_^15}', 'hello')
 
     end subroutine test
 
