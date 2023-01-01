@@ -59,13 +59,16 @@ contains
         ! empty constructor
         str1= string_t()
         call check(error, str1 % size() == 0)
+        if (allocated(error)) return
 
         ! character constructor
         chr = 'first test string'
         str1 = string_t(chr)
         call check(error, char(str1) == chr)
+        if (allocated(error)) return
         str2 = chr 
         call check(error, char(str2) == chr)
+        if (allocated(error)) return
         
         ! string constructor
         str1 = string_t('second test string')

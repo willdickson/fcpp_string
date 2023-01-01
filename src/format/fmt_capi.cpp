@@ -121,6 +121,6 @@ std::string *fmt_string(std::string *fmt_str, std::string *val_str)
     }
     else
     {
-        return fmt_str;
+        return new std::string("{}");
     }
 }

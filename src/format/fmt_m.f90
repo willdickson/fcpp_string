@@ -1,5 +1,10 @@
 module fmt_m
 
+    use, intrinsic :: iso_fortran_env, only : int32
+    use, intrinsic :: iso_fortran_env, only : int64
+    use, intrinsic :: iso_fortran_env, only : real32 
+    use, intrinsic :: iso_fortran_env, only : real64
+
     use, intrinsic :: iso_c_binding,  only : c_ptr
     use, intrinsic :: iso_c_binding,  only : c_int
     use, intrinsic :: iso_c_binding,  only : c_int32_t
@@ -32,10 +37,10 @@ module fmt_m
         procedure :: fmt_int32_from_char
         procedure :: fmt_int64
         procedure :: fmt_int64_from_char
-        procedure :: fmt_float
-        procedure :: fmt_float_from_char
-        procedure :: fmt_double
-        procedure :: fmt_double_from_char
+        procedure :: fmt_real32
+        procedure :: fmt_real32_from_char
+        procedure :: fmt_real64
+        procedure :: fmt_real64_from_char
         procedure :: fmt_logical
         procedure :: fmt_logical_from_char
         procedure :: fmt_string
@@ -48,14 +53,16 @@ contains
 
 
     function fmt_int32(fmt_str, val) result(res_str)
-        type(string_t),     intent(in) :: fmt_str
-        integer(c_int32_t), intent(in) :: val
-        type(string_t)                 :: res_str
-        type(string_t)                 :: cor_str
-        logical                        :: ok
+        type(string_t), intent(in) :: fmt_str
+        integer(int32), intent(in) :: val
+        type(string_t)             :: res_str
+        type(string_t)             :: cor_str
+        logical                    :: ok
+        integer(c_int32_t)         :: val_c
         call correct_fmt_str(fmt_str, cor_str, ok)
         if (ok) then
-            res_str = string_t(fmt_int32_c(cor_str % ptr, val))
+            val_c = int(val,kind=c_int32_t)
+            res_str = string_t(fmt_int32_c(cor_str % ptr, val_c))
         else
             res_str = cor_str 
         endif 
@@ -63,24 +70,26 @@ contains
 
 
     function fmt_int32_from_char(fmt_chr, val) result(res_str)
-        character(*),       intent(in) :: fmt_chr
-        integer(c_int32_t), intent(in) :: val
-        type(string_t)                 :: res_str
-        type(string_t)                 :: fmt_str
+        character(*),   intent(in) :: fmt_chr
+        integer(int32), intent(in) :: val
+        type(string_t)             :: res_str
+        type(string_t)             :: fmt_str
         fmt_str = string_t(fmt_chr)
         res_str = fmt_int32(fmt_str, val)
     end function fmt_int32_from_char
 
 
     function fmt_int64(fmt_str, val) result(res_str)
-        type(string_t),     intent(in) :: fmt_str
-        integer(c_int64_t), intent(in) :: val
-        type(string_t)                 :: res_str
-        type(string_t)                 :: cor_str
-        logical                        :: ok
+        type(string_t), intent(in) :: fmt_str
+        integer(int64), intent(in) :: val
+        type(string_t)             :: res_str
+        type(string_t)             :: cor_str
+        logical                    :: ok
+        integer(c_int64_t)         :: val_c
         call correct_fmt_str(fmt_str, cor_str, ok)
         if (ok) then
-            res_str = string_t(fmt_int64_c(cor_str % ptr, val))
+            val_c = int(val, kind=c_int64_t)
+            res_str = string_t(fmt_int64_c(cor_str % ptr, val_c))
         else
             res_str = cor_str 
         endif 
@@ -88,79 +97,87 @@ contains
 
 
     function fmt_int64_from_char(fmt_chr, val) result(res_str)
-        character(*),       intent(in) :: fmt_chr
-        integer(c_int64_t), intent(in) :: val
-        type(string_t)                 :: res_str
-        type(string_t)                 :: fmt_str
+        character(*),   intent(in) :: fmt_chr
+        integer(int64), intent(in) :: val
+        type(string_t)             :: res_str
+        type(string_t)             :: fmt_str
         fmt_str = string_t(fmt_chr)
         res_str = fmt_int64(fmt_str, val)
     end function fmt_int64_from_char
 
 
-    function fmt_float(fmt_str, val, prec) result(res_str)
+    function fmt_real32(fmt_str, val, prec) result(res_str)
         type(string_t),    intent(in) :: fmt_str
-        real(c_float),     intent(in) :: val
+        real(real32),      intent(in) :: val
         integer, optional, intent(in) :: prec
         type(string_t)                :: res_str
         type(string_t)                :: cor_str
+        real(c_float)                 :: val_c
         integer(c_int)                :: prec_c
+        type(c_ptr)                   :: ptr
         logical                       :: ok
         call correct_fmt_str(fmt_str, cor_str, ok)
         if (ok) then
+            val_c = int(val, kind=c_float)
             if (.not. present(prec)) then
                 res_str = string_t(fmt_float_c(cor_str % ptr, val))
             else
-                prec_c  = int(prec, kind=c_int)
-                res_str = string_t(fmt_float_with_prec_c(cor_str % ptr, val, prec_c))
+                prec_c = int(prec, kind=c_int)
+                ptr = fmt_float_with_prec_c(cor_str % ptr, val_c, prec_c)
+                res_str = string_t(ptr)
             end if
         else
             res_str = cor_str
         end if
-    end function fmt_float
+    end function fmt_real32
 
 
-    function fmt_float_from_char(fmt_chr, val, prec) result(res_str)
+    function fmt_real32_from_char(fmt_chr, val, prec) result(res_str)
         character(*),      intent(in) :: fmt_chr
-        real(c_float),     intent(in) :: val
+        real(real32),      intent(in) :: val
         integer, optional, intent(in) :: prec
         type(string_t)                :: res_str
         type(string_t)                :: fmt_str
         fmt_str = string_t(fmt_chr)
-        res_str = fmt_float(fmt_str, val, prec)
-    end function fmt_float_from_char
+        res_str = fmt_real32(fmt_str, val, prec)
+    end function fmt_real32_from_char
 
 
-    function fmt_double(fmt_str, val, prec) result(res_str)
+    function fmt_real64(fmt_str, val, prec) result(res_str)
         type(string_t),    intent(in) :: fmt_str
-        real(c_double),    intent(in) :: val
+        real(real64),      intent(in) :: val
         integer, optional, intent(in) :: prec
         type(string_t)                :: res_str
         type(string_t)                :: cor_str
+        real(c_double)                :: val_c
         integer(c_int)                :: prec_c
+        type(c_ptr)                   :: ptr
         logical                       :: ok
         call correct_fmt_str(fmt_str, cor_str, ok)
         if (ok) then
+            val_c = int(val, kind=c_double)
             if (.not. present(prec)) then
                 res_str = string_t(fmt_double_c(cor_str % ptr, val))
             else
                 prec_c  = int(prec, kind=c_int)
-                res_str = string_t(fmt_double_with_prec_c(cor_str % ptr, val, prec_c))
+                ptr = fmt_double_with_prec_c(cor_str % ptr, val_c, prec_c)
+                res_str = string_t(ptr)
             end if
         else
             res_str = cor_str
         end if
-    end function fmt_double
+    end function fmt_real64
 
 
-    function fmt_double_from_char(fmt_chr, val, prec) result(res_str)
+    function fmt_real64_from_char(fmt_chr, val, prec) result(res_str)
         character(*),      intent(in) :: fmt_chr
-        real(c_double),    intent(in) :: val
+        real(real64),    intent(in) :: val
         integer, optional, intent(in) :: prec
         type(string_t)                :: res_str
         type(string_t)                :: fmt_str
         fmt_str = string_t(fmt_chr)
-        res_str = fmt_double(fmt_str, val, prec)
-    end function fmt_double_from_char
+        res_str = fmt_real64(fmt_str, val, prec)
+    end function fmt_real64_from_char
 
 
     function fmt_logical(fmt_str, val) result(res_str)

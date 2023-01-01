@@ -4,6 +4,7 @@ program test_main
     use testdrive,    only : new_testsuite 
     use testdrive,    only : testsuite_type
     use string_tests, only : collect_string_tests
+    use fmt_tests,    only : collect_fmt_tests
     implicit none
 
     integer :: i
@@ -11,7 +12,8 @@ program test_main
     type(testsuite_type), allocatable :: testsuites(:)
 
     testsuites = [ &
-        new_testsuite('string_tests', collect_string_tests)  &
+        new_testsuite('string_tests', collect_string_tests),  &
+        new_testsuite('fmt_tests',    collect_fmt_tests)      &
         ]
 
     stat = 0

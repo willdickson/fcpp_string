@@ -9,7 +9,7 @@ module fcpp_string
     use cpp_string_m, only : string_t
     use cpp_string_m, only : char
     use cpp_string_m, only : len
-    use fmt_m,        only : sfmt => string_fmt
+    use fmt_m,        only : string_fmt
 
     implicit none
     private
@@ -17,6 +17,8 @@ module fcpp_string
     public :: string_t
     public :: char
     public :: len
+    public :: string_fmt
+
     public :: test
 
 contains
@@ -30,18 +32,18 @@ contains
 
         do i = 1, 10
             rval = i/3.2
-            print *, i, sfmt('val = {2.3f}', rval)
+            print *, i, string_fmt('val = {2.3f}', rval)
         end do
 
         ival = 10000090 
-        print *, sfmt('integer = {#x}', ival)
+        print *, string_fmt('integer = {#x}', ival)
 
         flag = .true.
-        print *, sfmt('flag = |{ ^9}|', flag)
+        print *, string_fmt('flag = |{ ^9}|', flag)
         flag = .false.
-        print *, sfmt('flag = |{ ^9}|', flag)
+        print *, string_fmt('flag = |{ ^9}|', flag)
 
-        print *, sfmt('string {_^15}', 'hello')
+        print *, string_fmt('string {_^15}', 'hello')
 
     end subroutine test
 
