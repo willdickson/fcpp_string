@@ -278,6 +278,4 @@ contains
         end if
     end subroutine correct_fmt_str
 
-
-
 end module fmt_m
