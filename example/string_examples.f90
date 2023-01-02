@@ -96,6 +96,34 @@ program string_examples
         print *, ''
     end block
 
+    ! size 
+    ! ---------------------------------------------------------------
+    block
+        type(string_t) :: s
+        integer        :: n
+
+        print *, 'get size of string with size'
+        s = '123456'
+        n = s % size()
+        print *, 's = ', s
+        print *, 's % size() = ', n
+        print *, ''
+    end block
+
+    ! len (same value as size)
+    ! ---------------------------------------------------------------
+    block
+        type(string_t) :: s
+        integer        :: n
+
+        print *, 'get len with len function (same result as size)'
+        s = '12345678'
+        n = len(s)
+        print *, 's = ', s
+        print *, 'len(s) = ', n
+        print *, ''
+    end block
+
     ! clear 
     ! ---------------------------------------------------------------
     block
