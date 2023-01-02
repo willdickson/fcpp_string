@@ -118,7 +118,7 @@ contains
         logical                       :: ok
         call correct_fmt_str(fmt_str, cor_str, ok)
         if (ok) then
-            val_c = int(val, kind=c_float)
+            val_c = real(val, kind=c_float)
             if (.not. present(prec)) then
                 res_str = string_t(fmt_float_c(cor_str % ptr, val))
             else
@@ -155,7 +155,7 @@ contains
         logical                       :: ok
         call correct_fmt_str(fmt_str, cor_str, ok)
         if (ok) then
-            val_c = int(val, kind=c_double)
+            val_c = real(val, kind=c_double)
             if (.not. present(prec)) then
                 res_str = string_t(fmt_double_c(cor_str % ptr, val))
             else
