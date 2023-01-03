@@ -2,8 +2,9 @@
 ==========================================
 
 fcpp_string is a fortran wrapper for c++ strings designed to (hopefully) make
-it easier to mix c++ and fortran code.  It provides a string type *string_t*
-and some basic string formatting *string_fmt* based on [fmtlib](https://github.com/fmtlib/fmt).
+it a bit easier to mix c++ and fortran code.  It provides a string type
+*string_t* and some basic string formatting *string_fmt* based on
+[fmtlib](https://github.com/fmtlib/fmt).
 
 The string_t type is mostly a straight wrapper of C++'s std::string class. It
 provides many of the same methods as std::string and for the most part they
