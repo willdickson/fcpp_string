@@ -52,7 +52,6 @@ print *, s
 c = s % to_character()
 
 ! or with char
-
 c = char(s)
 ```
 

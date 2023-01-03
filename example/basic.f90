@@ -42,8 +42,6 @@ program basic
     c = s % to_character()
     
     ! or with char
-    
     c = char(s)
-
 
 end program basic
