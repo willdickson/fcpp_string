@@ -56,6 +56,40 @@ c = s % to_character()
 c = char(s)
 ```
 
+### List of methods available for string_t:  
+
+* append        
+* assignment(=) 
+* at            
+* clear         
+* compare       
+* copy          
+* empty         
+* erase         
+* find          
+* initialized   
+* insert        
+* operator(+)   
+* operator(//)  
+* operator(==)  
+* operator(/=)  
+* pop_back      
+* push_back     
+* replace       
+* rfind         
+* set           
+* size          
+* to\_character  
+* write(formatted) 
+
+### List of helper functions:
+
+* char
+* len
+* string_fmt
+
+
+
 
 
 
